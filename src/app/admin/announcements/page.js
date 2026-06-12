@@ -6,6 +6,7 @@ import { getAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnounc
 import ImageUpload from '@/components/admin/ImageUpload'
 import MarkdownEditor from '@/components/admin/MarkdownEditor'
 import Pagination from '@/components/admin/Pagination'
+import { LanguageTabs, TranslateButton, EnField } from '@/components/admin/TranslateTools'
 import { formatDate } from '@/lib/utils'
 import { ANNOUNCEMENT_TYPES } from '@/lib/constants'
 
@@ -41,10 +42,14 @@ export default function AdminAnnouncementsPage() {
     image: '',
     startDate: '',
     endDate: '',
+    titleEn: '',
+    contentEn: '',
     isActive: true,
     showOnHomepage: false,
     isPinned: false
   })
+
+  const [langTab, setLangTab] = useState('vi')
 
   const loadData = async (pageToLoad = page) => {
     setIsLoading(true)
@@ -63,9 +68,11 @@ export default function AdminAnnouncementsPage() {
     setFormData({ 
       title: '', content: '', type: 'INFO', image: '', 
       startDate: '', endDate: '', 
+      titleEn: '', contentEn: '',
       isActive: true, showOnHomepage: false, isPinned: false 
     })
     setEditingId(null)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -79,9 +86,12 @@ export default function AdminAnnouncementsPage() {
       endDate: item.endDate ? new Date(item.endDate).toISOString().slice(0, 16) : '',
       isActive: item.isActive,
       showOnHomepage: item.showOnHomepage,
-      isPinned: item.isPinned
+      isPinned: item.isPinned,
+      titleEn: item.titleEn || '',
+      contentEn: item.contentEn || '',
     })
     setEditingId(item.id)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -346,7 +356,7 @@ export default function AdminAnnouncementsPage() {
                 </div>
               </div>
 
-              {/* Right Column: Markdown Editor */}
+              {/* Right Column: Content + Translation */}
               <div className="flex-1 flex flex-col min-w-0 bg-[#FAFAFA] p-0 lg:p-6 overflow-hidden">
                 <div className="flex-1 flex flex-col h-full bg-white lg:rounded-xl shadow-sm lg:border border-[#E8E2D2] overflow-hidden">
                   <div className="px-5 py-3 border-b border-[#E8E2D2] flex items-center justify-between bg-white">
@@ -354,12 +364,38 @@ export default function AdminAnnouncementsPage() {
                       <label className="block text-[15px] font-bold text-[#111111]">Nội dung thông báo (Markdown)</label>
                       <p className="text-[12px] text-[#888888] font-medium">Sử dụng Markdown để định dạng chữ đậm, chữ nghiêng, liên kết.</p>
                     </div>
+                    <LanguageTabs langTab={langTab} setLangTab={setLangTab} />
                   </div>
                   <div className="flex-1 min-h-0 overflow-hidden">
-                    <MarkdownEditor 
-                      value={formData.content}
-                      onChange={(content) => setFormData({...formData, content})}
-                    />
+                    {langTab === 'vi' ? (
+                      <div className="h-full flex flex-col">
+                        <div className="flex-1 min-h-0">
+                          <MarkdownEditor 
+                            value={formData.content}
+                            onChange={(content) => setFormData({...formData, content})}
+                          />
+                        </div>
+                        <div className="p-4 border-t border-[#E8E2D2]">
+                          <TranslateButton
+                            viFields={{ title: formData.title, content: formData.content }}
+                            onTranslated={(data) => {
+                              setFormData(prev => ({
+                                ...prev,
+                                titleEn: data.title || prev.titleEn,
+                                contentEn: data.content || prev.contentEn,
+                              }))
+                              setLangTab('en')
+                            }}
+                            disabled={!formData.title}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-5 space-y-5 overflow-y-auto h-full">
+                        <EnField label="Title (English)" value={formData.titleEn} onChange={(e) => setFormData({...formData, titleEn: e.target.value})} viValue={formData.title} />
+                        <EnField label="Content (English)" value={formData.contentEn} onChange={(e) => setFormData({...formData, contentEn: e.target.value})} viValue={formData.content?.substring(0, 100)} multiline />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import ContactModal from '@/components/public/ContactModal'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function FloatingCTA({ venue }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { t } = useLanguage()
 
   if (!venue?.hotline && !venue?.zalo && !venue?.googleMapsUrl) return null
 
@@ -17,7 +19,7 @@ export default function FloatingCTA({ venue }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
         </svg>
       ),
-      label: 'Tư vấn',
+      label: t.floatingCTA.consult,
       highlight: false,
     },
     venue?.hotline && {
@@ -26,7 +28,7 @@ export default function FloatingCTA({ venue }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
       ),
-      label: 'Gọi ngay',
+      label: t.floatingCTA.callNow,
       href: `tel:${venue.hotline}`,
       highlight: true,
     },
@@ -47,7 +49,7 @@ export default function FloatingCTA({ venue }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
-      label: 'Chỉ đường',
+      label: t.floatingCTA.directions,
       href: venue.googleMapsUrl,
       target: '_blank',
     },
@@ -113,19 +115,28 @@ export default function FloatingCTA({ venue }) {
 
         <div className="flex items-center justify-around py-2 px-3 gap-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           {items.map((item, i) => {
-            const className = `flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl transition-colors ${
+            const className = `relative overflow-hidden flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl transition-colors ${
               item.highlight
-                ? 'bg-[#D45A2A] text-white'
-                : 'bg-white text-[#555555] border border-[rgba(58,36,24,0.08)]'
+                ? 'bg-[#D45A2A] text-white shadow-[0_4px_12px_rgba(212,90,42,0.3)]'
+                : 'bg-white text-[#555555] border border-[rgba(58,36,24,0.08)] shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
             }`
 
             if (item.isButton) {
               return (
                 <button key={i} onClick={item.onClick} className={className}>
-                  {item.icon}
-                  <span className={`text-[12px] font-bold ${item.highlight ? 'text-white' : 'text-[#333333]'}`}>
-                    {item.label}
-                  </span>
+                  <div className="relative z-20 flex items-center gap-1.5">
+                    {item.icon}
+                    <span className={`text-[11px] font-bold sm:text-[12px] ${item.highlight ? 'text-white' : 'text-[#333333]'}`}>
+                      {item.label}
+                    </span>
+                  </div>
+                  {/* Animation Effect */}
+                  <div 
+                    className={`absolute top-0 -left-[100%] w-[50%] h-full skew-x-[-25deg] animate-[shine_4s_ease-in-out_infinite] pointer-events-none z-10 ${
+                      item.highlight ? 'bg-gradient-to-r from-transparent via-white/30 to-transparent' : 'bg-gradient-to-r from-transparent via-[#D45A2A]/10 to-transparent'
+                    }`} 
+                    style={{ animationDelay: `${i * 0.4}s` }} 
+                  />
                 </button>
               )
             }
@@ -138,10 +149,19 @@ export default function FloatingCTA({ venue }) {
                 rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
                 className={className}
               >
-                {item.icon}
-                <span className={`text-[12px] font-bold ${item.highlight ? 'text-white' : 'text-[#333333]'}`}>
-                  {item.label}
-                </span>
+                <div className="relative z-20 flex items-center gap-1.5">
+                  {item.icon}
+                  <span className={`text-[11px] font-bold sm:text-[12px] ${item.highlight ? 'text-white' : 'text-[#333333]'}`}>
+                    {item.label}
+                  </span>
+                </div>
+                {/* Animation Effect */}
+                <div 
+                  className={`absolute top-0 -left-[100%] w-[50%] h-full skew-x-[-25deg] animate-[shine_4s_ease-in-out_infinite] pointer-events-none z-10 ${
+                    item.highlight ? 'bg-gradient-to-r from-transparent via-white/30 to-transparent' : 'bg-gradient-to-r from-transparent via-[#D45A2A]/10 to-transparent'
+                  }`} 
+                  style={{ animationDelay: `${i * 0.4}s` }} 
+                />
               </a>
             )
           })}

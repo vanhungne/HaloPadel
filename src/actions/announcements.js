@@ -53,6 +53,8 @@ export async function createAnnouncement(data) {
         isActive: data.isActive !== undefined ? data.isActive : true,
         showOnHomepage: data.showOnHomepage !== undefined ? data.showOnHomepage : false,
         isPinned: data.isPinned !== undefined ? data.isPinned : false,
+        titleEn: data.titleEn || null,
+        contentEn: data.contentEn || null,
       }
     })
     revalidatePath('/admin/announcements')
@@ -80,6 +82,8 @@ export async function updateAnnouncement(id, data) {
         isActive: data.isActive,
         showOnHomepage: data.showOnHomepage,
         isPinned: data.isPinned,
+        titleEn: data.titleEn || null,
+        contentEn: data.contentEn || null,
       }
     })
     revalidatePath('/admin/announcements')

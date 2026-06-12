@@ -88,13 +88,13 @@ export const AMENITY_ICONS = {
 
 // Navigation items
 export const NAV_ITEMS = [
-  { label: 'Trang chủ', href: '/' },
-  { label: 'Giới thiệu', href: '/gioi-thieu' },
-  { label: 'Hình ảnh', href: '/hinh-anh' },
-  { label: 'Khuyến mãi', href: '/khuyen-mai' },
-  { label: 'Thông báo', href: '/thong-bao' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Liên hệ', href: '/lien-he' },
+  { key: 'home', label: 'Trang chủ', href: '/' },
+  { key: 'about', label: 'Giới thiệu', href: '/gioi-thieu' },
+  { key: 'gallery', label: 'Hình ảnh', href: '/hinh-anh' },
+  { key: 'promotions', label: 'Khuyến mãi', href: '/khuyen-mai' },
+  { key: 'announcements', label: 'Thông báo', href: '/thong-bao' },
+  { key: 'blog', label: 'Blog', href: '/blog' },
+  { key: 'contact', label: 'Liên hệ', href: '/lien-he' },
 ]
 
 // Admin navigation items
@@ -110,4 +110,5 @@ export const ADMIN_NAV_ITEMS = [
   { label: 'Bảng giá', href: '/admin/pricing', icon: '💰' },
   { label: 'Liên hệ', href: '/admin/contacts', icon: '📬' },
   { label: 'SEO', href: '/admin/seo', icon: '🔍' },
+  { label: 'AI Settings', href: '/admin/ai-settings', icon: '🤖' },
 ]

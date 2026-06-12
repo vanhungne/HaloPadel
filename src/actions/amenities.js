@@ -43,6 +43,8 @@ export async function createAmenity(data) {
         icon: data.icon || 'star', // default icon
         image: data.image || null,
         isActive: data.isActive !== undefined ? data.isActive : true,
+        nameEn: data.nameEn || null,
+        descriptionEn: data.descriptionEn || null,
       }
     })
     revalidatePath('/admin/amenities')
@@ -64,6 +66,8 @@ export async function updateAmenity(id, data) {
         icon: data.icon,
         image: data.image,
         isActive: data.isActive,
+        nameEn: data.nameEn || null,
+        descriptionEn: data.descriptionEn || null,
       }
     })
     revalidatePath('/admin/amenities')

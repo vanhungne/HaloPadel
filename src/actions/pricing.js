@@ -43,6 +43,9 @@ export async function createPricingPlan(data) {
         timeSlot: data.timeSlot,
         description: data.description || '',
         notes: data.notes || '',
+        nameEn: data.nameEn || null,
+        descriptionEn: data.descriptionEn || null,
+        notesEn: data.notesEn || null,
         isActive: data.isActive !== undefined ? data.isActive : true,
       }
     })
@@ -65,6 +68,9 @@ export async function updatePricingPlan(id, data) {
         timeSlot: data.timeSlot,
         description: data.description,
         notes: data.notes,
+        nameEn: data.nameEn || null,
+        descriptionEn: data.descriptionEn || null,
+        notesEn: data.notesEn || null,
         isActive: data.isActive,
       }
     })

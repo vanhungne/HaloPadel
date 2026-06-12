@@ -4,16 +4,19 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatDate } from '@/lib/utils'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { localize } from '@/lib/i18n/localize'
 
 export default function BlogClient({ posts = [] }) {
   const [activeTab, setActiveTab] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
+  const { t, locale } = useLanguage()
 
   const tabs = [
-    { id: 'ALL', label: 'Tất cả' },
-    { id: 'KIẾN THỨC PADEL', label: 'Kiến thức Padel' },
-    { id: 'TIN TỨC SÂN', label: 'Tin tức sân' },
-    { id: 'SỨC KHỎE & THỂ THAO', label: 'Sức khỏe & Thể thao' },
+    { id: 'ALL', label: t.common.all },
+    { id: 'KIẾN THỨC PADEL', label: t.blog.tabPadelKnowledge },
+    { id: 'TIN TỨC SÂN', label: t.blog.tabCourtNews },
+    { id: 'SỨC KHỎE & THỂ THAO', label: t.blog.tabHealthSport },
   ]
 
   const filteredBlogs = posts.filter(blog => {
@@ -42,10 +45,10 @@ export default function BlogClient({ posts = [] }) {
             HaloPadel
           </p>
           <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-[#111111] mb-4">
-            Blog & Kiến Thức
+            {t.blog.pageTitle}
           </h1>
           <p className="text-[#555555] text-lg">
-            Khám phá kiến thức, hướng dẫn chơi và tin tức cộng đồng Padel
+            {t.blog.pageSubtitle}
           </p>
         </div>
 
@@ -80,7 +83,7 @@ export default function BlogClient({ posts = [] }) {
             </div>
             <input
               type="text"
-              placeholder="Tìm bài viết, luật chơi, sức khỏe..."
+              placeholder={t.blog.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 rounded-full bg-white border border-[#E8E2D2] text-[#111111] placeholder-[#888888] focus:outline-none focus:border-[#D45A2A] focus:ring-1 focus:ring-[#D45A2A] transition-all shadow-sm"
@@ -92,7 +95,7 @@ export default function BlogClient({ posts = [] }) {
         {filteredBlogs.length === 0 && (
           <div className="text-center py-20 bg-white rounded-[24px] border border-[#E8E2D2]">
             <span className="text-5xl mb-4 block">🔍</span>
-            <p className="text-[#888888] text-lg">Không tìm thấy bài viết nào phù hợp.</p>
+            <p className="text-[#888888] text-lg">{t.blog.noResults}</p>
           </div>
         )}
 
@@ -118,16 +121,16 @@ export default function BlogClient({ posts = [] }) {
                   </span>
                   <span className="text-[#888888] text-[13px] font-medium flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {featuredBlog.viewCount || 0} lượt xem
+                    {featuredBlog.viewCount || 0} {t.common.views}
                   </span>
                 </div>
                 
                 <h2 className="font-heading text-3xl md:text-4xl font-bold text-[#111111] mb-4 leading-tight group-hover:text-[#D45A2A] transition-colors">
-                  {featuredBlog.title}
+                  {localize(featuredBlog, 'title', locale)}
                 </h2>
                 
                 <p className="text-[#555555] text-lg mb-8 leading-relaxed">
-                  {featuredBlog.excerpt}
+                  {localize(featuredBlog, 'excerpt', locale)}
                 </p>
 
                 <div className="flex items-center justify-between mt-auto pt-8 border-t border-[#E8E2D2]">
@@ -156,7 +159,7 @@ export default function BlogClient({ posts = [] }) {
           <div>
             {isDefaultView && (
               <h3 className="font-heading text-2xl font-bold text-[#111111] mb-8 flex items-center gap-3">
-                Bài viết mới nhất
+                {t.blog.latestPosts}
                 <div className="h-px bg-[#E8E2D2] flex-1"></div>
               </h3>
             )}
@@ -181,10 +184,10 @@ export default function BlogClient({ posts = [] }) {
                   
                   <div className="p-6 md:p-8 flex flex-col flex-1">
                     <h3 className="font-heading text-xl font-bold text-[#111111] mb-3 leading-snug group-hover:text-[#D45A2A] transition-colors line-clamp-2">
-                      {blog.title}
+                      {localize(blog, 'title', locale)}
                     </h3>
                     <p className="text-[#555555] text-[15px] mb-6 line-clamp-3 leading-relaxed flex-1">
-                      {blog.excerpt}
+                      {localize(blog, 'excerpt', locale)}
                     </p>
                     
                     <div className="mt-auto flex items-center justify-between border-t border-[#E8E2D2] pt-5">
@@ -192,7 +195,7 @@ export default function BlogClient({ posts = [] }) {
                         {formatDate(blog.publishedAt || blog.createdAt)}
                       </span>
                       <span className="text-[#D45A2A] font-bold text-[13px] flex items-center gap-1 group-hover:gap-2 transition-all">
-                        Đọc tiếp <span aria-hidden="true">&rarr;</span>
+                        {t.common.readMore} <span aria-hidden="true">&rarr;</span>
                       </span>
                     </div>
                   </div>

@@ -56,6 +56,27 @@ export async function updateLandingSectionStatus(id, isActive) {
   }
 }
 
+export async function updateLandingSection(id, data) {
+  try {
+    const updateData = {}
+    if (data.title !== undefined) updateData.title = data.title
+    if (data.subtitle !== undefined) updateData.subtitle = data.subtitle
+    if (data.titleEn !== undefined) updateData.titleEn = data.titleEn
+    if (data.subtitleEn !== undefined) updateData.subtitleEn = data.subtitleEn
+
+    await prisma.landingSection.update({
+      where: { id },
+      data: updateData
+    })
+    revalidatePath('/admin/landing')
+    revalidatePath('/')
+    return { success: true }
+  } catch (error) {
+    console.error('Failed to update landing section:', error)
+    return { success: false, error: 'Lỗi khi cập nhật section' }
+  }
+}
+
 export async function updateLandingSectionOrder(sections) {
   try {
     // Array of { id, displayOrder }

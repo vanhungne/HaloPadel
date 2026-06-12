@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { createContact } from '@/actions/contacts'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function ContactModal({ isOpen, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const { t } = useLanguage()
   
   const [formData, setFormData] = useState({
     fullName: '',
@@ -29,7 +31,7 @@ export default function ContactModal({ isOpen, onClose }) {
         onClose()
       }, 3000)
     } else {
-      alert(res?.error || 'Có lỗi xảy ra')
+      alert(res?.error || t.common.errorOccurred)
     }
   }
 
@@ -59,9 +61,9 @@ export default function ContactModal({ isOpen, onClose }) {
           </div>
           
           <div className="absolute inset-0 p-6 flex flex-col justify-center">
-            <h3 className="font-heading font-bold text-2xl text-white">Để lại thông tin</h3>
+            <h3 className="font-heading font-bold text-2xl text-white">{t.contactModal.title}</h3>
             <p className="text-white/80 text-[14px] mt-1">
-              Đội ngũ HaloPadel sẽ liên hệ tư vấn trong vòng 15 phút.
+              {t.contactModal.subtitle}
             </p>
           </div>
 
@@ -84,50 +86,50 @@ export default function ContactModal({ isOpen, onClose }) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h4 className="font-heading font-bold text-2xl text-[#111111] mb-2">Đăng ký thành công!</h4>
+              <h4 className="font-heading font-bold text-2xl text-[#111111] mb-2">{t.contactModal.successTitle}</h4>
               <p className="text-[#555555]">
-                Cảm ơn bạn đã quan tâm. Chúng tôi sẽ gọi lại cho bạn vào thời gian sớm nhất.
+                {t.contactModal.successMessage}
               </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-[13px] font-bold text-[#111111] mb-1.5 ml-1">
-                  Họ và tên <span className="text-[#D45A2A]">*</span>
+                  {t.contactModal.fullName} <span className="text-[#D45A2A]">*</span>
                 </label>
                 <input 
                   type="text" 
                   required
                   value={formData.fullName}
                   onChange={e => setFormData({...formData, fullName: e.target.value})}
-                  placeholder="Nhập tên của bạn"
+                  placeholder={t.contactModal.namePlaceholder}
                   className="w-full px-4 py-3 bg-[#F8F5E4] border border-transparent focus:border-[#D45A2A] focus:bg-white rounded-xl text-[#111111] placeholder-[#888888] outline-none transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-[13px] font-bold text-[#111111] mb-1.5 ml-1">
-                  Số điện thoại <span className="text-[#D45A2A]">*</span>
+                  {t.contactModal.phone} <span className="text-[#D45A2A]">*</span>
                 </label>
                 <input 
                   type="tel" 
                   required
                   value={formData.phone}
                   onChange={e => setFormData({...formData, phone: e.target.value})}
-                  placeholder="Nhập số điện thoại"
+                  placeholder={t.contactModal.phonePlaceholder}
                   className="w-full px-4 py-3 bg-[#F8F5E4] border border-transparent focus:border-[#D45A2A] focus:bg-white rounded-xl text-[#111111] placeholder-[#888888] outline-none transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-[13px] font-bold text-[#111111] mb-1.5 ml-1">
-                  Nội dung cần tư vấn
+                  {t.contactModal.message}
                 </label>
                 <textarea 
                   rows={3}
                   value={formData.message}
                   onChange={e => setFormData({...formData, message: e.target.value})}
-                  placeholder="Bạn quan tâm đến đặt sân, đăng ký học hay mua gói tháng?"
+                  placeholder={t.contactModal.messagePlaceholder}
                   className="w-full px-4 py-3 bg-[#F8F5E4] border border-transparent focus:border-[#D45A2A] focus:bg-white rounded-xl text-[#111111] placeholder-[#888888] outline-none transition-all resize-none"
                 />
               </div>
@@ -147,7 +149,7 @@ export default function ContactModal({ isOpen, onClose }) {
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
-                    Gửi yêu cầu
+                    {t.common.sendRequest}
                   </>
                 )}
               </button>

@@ -4,10 +4,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { formatDate } from '@/lib/utils'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { localize, localizeStrict } from '@/lib/i18n/localize'
 
 export default function AnnouncementsSection({ section, announcements = [] }) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
+  const { t, locale } = useLanguage()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -30,11 +33,11 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
 
   const getTypeStyle = (type) => {
     switch (type) {
-      case 'INFO': return { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Thông tin' }
-      case 'EVENT': return { bg: 'bg-amber-50', text: 'text-amber-600', label: 'Sự kiện' }
-      case 'PROMO': return { bg: 'bg-[#D45A2A]/10', text: 'text-[#D45A2A]', label: 'Ưu đãi' }
-      case 'MAINTENANCE': return { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Bảo trì' }
-      default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: 'Thông báo' }
+      case 'INFO': return { bg: 'bg-blue-100', text: 'text-blue-700', label: t.announcements.typeInfo }
+      case 'EVENT': return { bg: 'bg-amber-50', text: 'text-amber-600', label: t.announcements.typeEvent }
+      case 'PROMO': return { bg: 'bg-[#D45A2A]/10', text: 'text-[#D45A2A]', label: t.announcements.typePromo }
+      case 'MAINTENANCE': return { bg: 'bg-gray-100', text: 'text-gray-600', label: t.announcements.typeMaintenance }
+      default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: t.announcements.typeDefault }
     }
   }
 
@@ -44,13 +47,13 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
         {/* Section Header */}
         <div className="text-center mb-10 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
-            Thông báo mới nhất
+            {t.announcements.sectionLabel}
           </p>
           <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
-            {section?.title || 'Bảng tin HaloPadel'}
+            {localizeStrict(section, 'title', locale) || t.announcements.sectionTitle}
           </h2>
           <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            {section?.subtitle || 'Cập nhật lịch hoạt động, sự kiện và ưu đãi từ hệ thống sân của chúng tôi.'}
+            {localizeStrict(section, 'subtitle', locale) || t.announcements.sectionSubtitle}
           </p>
         </div>
 
@@ -80,19 +83,19 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
                   </svg>
-                  Ghim
+                  {t.common.pinned}
                 </span>
                 <span className="px-3 py-1 bg-[#111111] text-white text-[12px] font-bold uppercase tracking-wider rounded-md shadow-sm">
-                  Quan trọng
+                  {t.common.important}
                 </span>
               </div>
               
               <h3 className="font-heading text-2xl md:text-[28px] font-bold text-[#111111] mb-4 leading-snug">
-                {featured.title}
+                {localize(featured, 'title', locale)}
               </h3>
               
               <p className="text-[#555555] text-[15px] md:text-[16px] leading-relaxed mb-8 flex-1 line-clamp-3">
-                {featured.content?.substring(0, 150)}...
+                {(localize(featured, 'content', locale))?.substring(0, 150)}...
               </p>
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-6 border-t border-[#D45A2A]/20 mt-auto">
@@ -100,14 +103,14 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
                   <svg className="w-4 h-4 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  {featured.startDate ? `Áp dụng từ: ${formatDate(featured.startDate)}` : `Đăng ngày: ${formatDate(featured.createdAt)}`}
+                  {featured.startDate ? `${t.common.validFrom} ${formatDate(featured.startDate)}` : `${t.common.postedOn} ${formatDate(featured.createdAt)}`}
                 </div>
                 
                 <Link 
-                  href={`/thong-bao/${featured.id}`}
+                  href={`/thong-bao/${featured.slug}`}
                   className="inline-flex items-center justify-center gap-2 h-[44px] px-6 bg-transparent border-2 border-[#D45A2A] hover:bg-[#D45A2A] text-[#D45A2A] hover:text-white rounded-xl font-bold text-[14px] transition-colors w-full sm:w-auto"
                 >
-                  Xem chi tiết
+                  {t.common.viewDetails}
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -123,7 +126,7 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
               return (
                 <Link
                   key={ann.id}
-                  href={`/thong-bao/${ann.id}`}
+                  href={`/thong-bao/${ann.slug}`}
                   className="group flex items-center gap-4 p-5 transition-all duration-300"
                   style={{
                     background: '#FFFDF7',
@@ -151,7 +154,7 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
                       </span>
                     </div>
                     <h3 className="text-[15px] font-bold text-[#111111] group-hover:text-[#D45A2A] transition-colors truncate">
-                      {ann.title}
+                      {localize(ann, 'title', locale)}
                     </h3>
                   </div>
                   
@@ -172,7 +175,7 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
             href="/thong-bao"
             className="inline-flex items-center gap-2 text-[15px] font-bold text-[#D45A2A] hover:text-[#B8431D] transition-colors"
           >
-            Xem tất cả thông báo
+            {t.common.viewAllAnnouncements}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>

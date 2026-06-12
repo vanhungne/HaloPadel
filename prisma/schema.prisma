@@ -31,6 +31,7 @@ model User {
   announcements Announcement[]
   mediaFiles    MediaFile[]
   auditLogs     AuditLog[]
+  aiUsageLogs   AiUsageLog[]
 
   @@map("Users")
 }
@@ -73,6 +74,9 @@ model Venue {
   contacts        Contact[]
   seoSettings     SeoSetting[]
   auditLogs       AuditLog[]
+  aiSetting       AiSetting?
+  aiApiKeys       AiApiKey[]
+  aiUsageLogs     AiUsageLog[]
 
   @@map("Venues")
 }
@@ -87,6 +91,8 @@ model LandingSection {
   sectionKey   String   @db.NVarChar(50) // hero, about, quickinfo, gallery, amenities, pricing, promotions, announcements, blog, map, contact
   title        String?  @db.NVarChar(200)
   subtitle     String?  @db.NVarChar(500)
+  titleEn      String?  @db.NVarChar(200)
+  subtitleEn   String?  @db.NVarChar(500)
   isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
   config       String?  @db.NVarChar(Max) // JSON extra config
@@ -163,6 +169,9 @@ model BlogPost {
   slug           String    @db.NVarChar(300)
   excerpt        String?   @db.NVarChar(500)
   content        String?   @db.NVarChar(Max)
+  titleEn        String?   @db.NVarChar(300)
+  excerptEn      String?   @db.NVarChar(500)
+  contentEn      String?   @db.NVarChar(Max)
   coverImage     String?   @db.NVarChar(1000)
   status         String    @default("DRAFT") @db.NVarChar(20) // DRAFT, PUBLISHED, HIDDEN
   showOnHomepage Boolean   @default(false)
@@ -198,6 +207,10 @@ model Promotion {
   banner         String?   @db.NVarChar(1000)
   shortDesc      String?   @db.NVarChar(500)
   content        String?   @db.NVarChar(Max)
+  titleEn        String?   @db.NVarChar(300)
+  shortDescEn    String?   @db.NVarChar(500)
+  contentEn      String?   @db.NVarChar(Max)
+  ctaTextEn      String?   @db.NVarChar(100)
   startDate      DateTime?
   endDate        DateTime?
   conditions     String?   @db.NVarChar(Max)
@@ -232,6 +245,8 @@ model Announcement {
   title          String    @db.NVarChar(300)
   slug           String    @db.NVarChar(300)
   content        String?   @db.NVarChar(Max)
+  titleEn        String?   @db.NVarChar(300)
+  contentEn      String?   @db.NVarChar(Max)
   type           String    @default("INFO") @db.NVarChar(30) // INFO, PROMOTION, EVENT, MAINTENANCE, WARNING
   image          String?   @db.NVarChar(1000)
   startDate      DateTime?
@@ -263,6 +278,8 @@ model Amenity {
   icon         String?  @db.NVarChar(100)
   image        String?  @db.NVarChar(1000)
   description  String?  @db.NVarChar(300)
+  nameEn       String?  @db.NVarChar(100)
+  descriptionEn String? @db.NVarChar(300)
   displayOrder Int      @default(0)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
@@ -285,6 +302,9 @@ model PricingPlan {
   price        String?  @db.NVarChar(200)
   timeSlot     String?  @db.NVarChar(200)
   notes        String?  @db.NVarChar(500)
+  nameEn       String?  @db.NVarChar(200)
+  descriptionEn String? @db.NVarChar(500)
+  notesEn      String?  @db.NVarChar(500)
   displayOrder Int      @default(0)
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
@@ -360,4 +380,77 @@ model AuditLog {
   venue Venue? @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("AuditLogs")
+}
+
+// ============================================
+// AI SETTINGS & GROQ INTEGRATION
+// ============================================
+
+model AiSetting {
+  id                     Int      @id @default(autoincrement())
+  venueId                Int      @unique
+  venue                  Venue    @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  isEnabled              Boolean  @default(true)
+  provider               String   @default("GROQ")
+  defaultModel           String   @default("llama-3.3-70b-versatile")
+  temperature            Float    @default(0.7)
+  maxTokens              Int      @default(4000)
+  defaultLanguage        String   @default("Vietnamese")
+  defaultBlogStatus      String   @default("DRAFT")
+  enableImageGeneration  Boolean  @default(false)
+  enableCloudinaryUpload Boolean  @default(false)
+  rotationStrategy       String   @default("ROUND_ROBIN")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("AiSettings")
+}
+
+model AiApiKey {
+  id              Int       @id @default(autoincrement())
+  venueId         Int
+  venue           Venue     @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  provider        String    @default("GROQ")
+  name            String    @db.NVarChar(100)
+  encryptedApiKey String    @db.NVarChar(500)
+  maskedApiKey    String    @db.NVarChar(100)
+  priority        Int       @default(0)
+  isActive        Boolean   @default(true)
+  dailyUsageCount Int       @default(0)
+  totalUsageCount Int       @default(0)
+  successCount    Int       @default(0)
+  failureCount    Int       @default(0)
+  lastUsedAt      DateTime?
+  lastError       String?   @db.NVarChar(500)
+  cooldownUntil   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  isDeleted       Boolean   @default(false)
+  deletedAt       DateTime?
+
+  logs            AiUsageLog[]
+
+  @@map("AiApiKeys")
+}
+
+model AiUsageLog {
+  id            Int       @id @default(autoincrement())
+  venueId       Int
+  venue         Venue     @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userId        Int
+  user          User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  apiKeyId      Int?
+  apiKey        AiApiKey? @relation(fields: [apiKeyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  provider      String    @default("GROQ")
+  model         String
+  feature       String    // BLOG_GENERATION, IMAGE_PROMPT_GENERATION
+  inputPrompt   String?   @db.NVarChar(MAX)
+  outputSummary String?   @db.NVarChar(MAX)
+  status        String    // SUCCESS, FAILED
+  errorMessage  String?   @db.NVarChar(MAX)
+  tokensUsed    Int       @default(0)
+  durationMs    Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  @@map("AiUsageLogs")
 }

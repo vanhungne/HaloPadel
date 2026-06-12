@@ -1,7 +1,11 @@
+'use client'
+
 import Link from 'next/link'
 import { NAV_ITEMS } from '@/lib/constants'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function Footer({ venue }) {
+  const { t } = useLanguage()
   const currentYear = new Date().getFullYear()
 
   let parsedHours = []
@@ -28,7 +32,7 @@ export default function Footer({ venue }) {
 
   const renderDays = (days) => {
     if (days.length === 1) return days[0]
-    if (days.length === 7) return 'Tất cả các ngày'
+    if (days.length === 7) return t.common.allDays
     return `${days[0]} – ${days[days.length - 1]}`
   }
 
@@ -56,7 +60,7 @@ export default function Footer({ venue }) {
               </div>
             </div>
             <p className="text-white/40 text-[13px] leading-relaxed mb-5">
-              {venue?.shortDesc || 'Sân Padel chuyên nghiệp tại Đà Nẵng - Không gian tập luyện đẳng cấp với tiện nghi hiện đại.'}
+              {venue?.shortDesc || t.footer.defaultDesc}
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-2.5">
@@ -83,12 +87,12 @@ export default function Footer({ venue }) {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-heading font-bold text-[15px] mb-5 text-white/90">Liên kết nhanh</h3>
+            <h3 className="font-heading font-bold text-[15px] mb-5 text-white/90">{t.footer.quickLinks}</h3>
             <ul className="space-y-2.5">
               {NAV_ITEMS.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="text-white/40 hover:text-[#BE4F24] text-[13px] transition-colors">
-                    {item.label}
+                    {t.nav[item.key] || item.label}
                   </Link>
                 </li>
               ))}
@@ -97,7 +101,7 @@ export default function Footer({ venue }) {
 
           {/* Contact Info */}
           <div>
-            <h3 className="font-heading font-bold text-[15px] mb-5 text-white/90">Liên hệ</h3>
+            <h3 className="font-heading font-bold text-[15px] mb-5 text-white/90">{t.footer.contactInfo}</h3>
             <ul className="space-y-3 text-[13px] text-white/40">
               {venue?.address && (
                 <li className="flex items-start gap-2.5">
@@ -122,7 +126,7 @@ export default function Footer({ venue }) {
 
           {/* Opening Hours */}
           <div>
-            <h3 className="font-heading font-bold text-[15px] mb-5 text-white/90">Giờ mở cửa</h3>
+            <h3 className="font-heading font-bold text-[15px] mb-5 text-white/90">{t.footer.openingHours}</h3>
             <div className="text-[13px] text-white/40 space-y-2.5">
               {groupedHours.length > 0 ? (
                 groupedHours.map((group, idx) => (
@@ -134,17 +138,17 @@ export default function Footer({ venue }) {
               ) : (
                 <>
                   <div className="flex justify-between">
-                    <span>Thứ 2 – Thứ 6</span>
+                    <span>{t.footer.weekday}</span>
                     <span className="text-white/80 font-medium">06:00 – 22:00</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Thứ 7 – Chủ nhật</span>
+                    <span>{t.footer.weekend}</span>
                     <span className="text-white/80 font-medium">06:00 – 23:00</span>
                   </div>
                 </>
               )}
               <div className="mt-4 px-3 py-2.5 rounded-xl bg-[#BE4F24]/10 border border-[#BE4F24]/20 text-[#BE4F24] text-[12px] text-center">
-                Mở cửa tất cả các ngày trong tuần
+                {t.common.openAllDays}
               </div>
             </div>
           </div>
@@ -154,8 +158,8 @@ export default function Footer({ venue }) {
       {/* Bottom Bar */}
       <div className="border-t border-white/8">
         <div className="section-container py-4 flex flex-col md:flex-row items-center justify-between gap-2 text-[12px] text-white/30">
-          <p>© {currentYear} {venue?.name || 'HaloPadel'}. Tất cả quyền được bảo lưu.</p>
-          <p>Thiết kế & phát triển bởi <span className="text-[#BE4F24]/70">HaloPadel Team</span></p>
+          <p>© {currentYear} {venue?.name || 'HaloPadel'}. {t.common.allRightsReserved}</p>
+          <p>{t.common.designedBy} <span className="text-[#BE4F24]/70">HaloPadel Team</span></p>
         </div>
       </div>
     </footer>

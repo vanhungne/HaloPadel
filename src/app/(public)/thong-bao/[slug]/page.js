@@ -1,126 +1,8 @@
-'use client'
-
-import { useParams, notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
-
-// Import Mock Data from our announcements list
-const mockAnnouncements = [
-  {
-    id: '1',
-    title: 'Thông báo giờ hoạt động mùa hè 2026',
-    excerpt: 'HaloPadel chính thức cập nhật khung giờ hoạt động mùa hè để phục vụ cộng đồng đam mê Padel. Mở cửa xuyên suốt từ sáng sớm đến đêm muộn.',
-    content: `
-      <h2>Chi tiết khung giờ mùa hè</h2>
-      <p>Từ ngày 01/06/2026, HaloPadel sẽ áp dụng khung giờ hoạt động mới:</p>
-      <ul>
-        <li><strong>Thứ 2 - Thứ 6:</strong> 05:00 - 23:00</li>
-        <li><strong>Thứ 7 - Chủ Nhật:</strong> 05:00 - 24:00</li>
-      </ul>
-      <h2>Các dịch vụ đi kèm</h2>
-      <p>Nhằm đáp ứng nhu cầu tập luyện tăng cao trong mùa hè, chúng tôi cũng tăng cường đội ngũ huấn luyện viên (HLV) tại sân vào tất cả các khung giờ. Cafe và các dịch vụ F&B sẽ mở cửa phục vụ xuyên suốt thời gian sân hoạt động.</p>
-    `,
-    type: 'INFO',
-    isPinned: true,
-    createdAt: new Date('2026-05-28T08:00:00Z'),
-    effectiveDate: new Date('2026-06-01T00:00:00Z')
-  },
-  {
-    id: '2',
-    title: 'Giải đấu Padel mở rộng tháng 7/2026',
-    excerpt: 'Đăng ký ngay giải đấu lớn nhất khu vực với tổng giải thưởng lên đến 50 triệu đồng. Dành cho mọi cấp độ người chơi.',
-    content: `
-      <h2>Thông tin giải đấu</h2>
-      <p>Giải đấu HaloPadel Open 2026 chính thức mở cổng đăng ký từ hôm nay!</p>
-      <h2>Thể thức thi đấu</h2>
-      <ul>
-        <li>Hạng mục: Đôi Nam, Đôi Nữ, Đôi Nam Nữ</li>
-        <li>Cấp độ: Amateur (Nghiệp dư) và Pro-Am (Bán chuyên)</li>
-        <li>Vòng bảng thi đấu vòng tròn 1 lượt, vòng Knock-out loại trực tiếp.</li>
-      </ul>
-      <h2>Giải thưởng</h2>
-      <p>Tổng giải thưởng tiền mặt lên đến 50.000.000 VNĐ cùng rất nhiều phần quà hiện vật giá trị từ các nhà tài trợ Babolat, Head, Bullpadel.</p>
-    `,
-    type: 'EVENT',
-    isPinned: false,
-    createdAt: new Date('2026-06-10T09:00:00Z'),
-    effectiveDate: new Date('2026-07-15T00:00:00Z')
-  },
-  {
-    id: '3',
-    title: 'Ưu đãi gói tháng đặc biệt cho hội nhóm',
-    excerpt: 'Chỉ trong tháng 6 này, đăng ký gói tháng cho nhóm từ 4 người trở lên sẽ được giảm ngay 25% và tặng kèm 2 giờ giao lưu miễn phí.',
-    content: `
-      <h2>Chương trình ưu đãi</h2>
-      <p>Nhân dịp chào hè, HaloPadel tung chương trình khuyến mãi siêu khủng dành cho hội nhóm đam mê Padel.</p>
-      <ul>
-        <li>Giảm ngay 25% khi đăng ký Gói Tháng (thời hạn 3 tháng trở lên).</li>
-        <li>Tặng kèm 2 giờ chơi miễn phí có HLV hướng dẫn nâng cao (trị giá 1.500.000đ).</li>
-        <li>Giảm 10% cho tất cả thức uống tại quầy Lounge Bar.</li>
-      </ul>
-      <p><em>Lưu ý: Số lượng ưu đãi có hạn, chương trình có thể kết thúc sớm khi đủ số lượng đăng ký.</em></p>
-    `,
-    type: 'PROMO',
-    isPinned: false,
-    createdAt: new Date('2026-06-05T14:30:00Z'),
-    effectiveDate: null
-  },
-  {
-    id: '4',
-    title: 'Lịch bảo trì mặt sân định kỳ tuần này',
-    excerpt: 'Để đảm bảo chất lượng mặt cỏ tốt nhất, chúng tôi sẽ tiến hành bảo trì sân số 1 và số 2 vào sáng thứ 4 tuần này.',
-    content: `
-      <h2>Lịch bảo trì mặt sân</h2>
-      <p>Nhằm mang lại trải nghiệm đánh bóng mượt mà nhất và bảo vệ tuổi thọ thảm cỏ nhân tạo, đội ngũ kỹ thuật của HaloPadel sẽ tiến hành chải cát và vệ sinh mặt sân.</p>
-      <ul>
-        <li><strong>Thời gian:</strong> 08:00 - 12:00, Thứ 4 (14/06/2026)</li>
-        <li><strong>Khu vực ảnh hưởng:</strong> Sân số 1 và Sân số 2</li>
-      </ul>
-      <p>Các khách hàng đã đặt lịch vào khung giờ này sẽ được nhân viên CSKH chủ động liên hệ để dời lịch sang sân số 3, 4 hoặc đổi thời gian theo yêu cầu.</p>
-    `,
-    type: 'INFO',
-    isPinned: false,
-    createdAt: new Date('2026-06-08T10:00:00Z'),
-    effectiveDate: new Date('2026-06-14T00:00:00Z')
-  },
-  {
-    id: '5',
-    title: 'Cập nhật quy định mượn/thuê vợt tại sân',
-    excerpt: 'Thông báo về chính sách mượn vợt tập luyện mới dành cho học viên và khách vãng lai, áp dụng từ tuần sau.',
-    content: `
-      <h2>Quy định thuê/mượn vợt mới</h2>
-      <p>Để đảm bảo số lượng và chất lượng vợt tập luyện tại sân, BQL HaloPadel xin thông báo cập nhật chính sách như sau:</p>
-      <ul>
-        <li><strong>Đối với khách vãng lai:</strong> Phí thuê vợt là 50.000đ/cây/buổi. Quý khách vui lòng để lại CCCD hoặc đặt cọc 500.000đ tại quầy lễ tân.</li>
-        <li><strong>Đối với học viên mua gói tháng:</strong> Miễn phí mượn vợt trong suốt quá trình tập luyện.</li>
-        <li>Khách hàng làm gãy, nứt hoặc hư hỏng nặng khung vợt do cố ý đập vợt sẽ phải bồi thường 100% giá trị vợt hiện hành.</li>
-      </ul>
-    `,
-    type: 'RULE',
-    isPinned: false,
-    createdAt: new Date('2026-06-02T16:00:00Z'),
-    effectiveDate: new Date('2026-06-15T00:00:00Z')
-  },
-  {
-    id: '6',
-    title: 'Khai giảng lớp Padel cơ bản K12',
-    excerpt: 'Lớp học dành cho người mới bắt đầu, trang bị kiến thức luật chơi, kỹ thuật cầm vợt và di chuyển cơ bản.',
-    content: `
-      <h2>Thông tin khóa học cơ bản K12</h2>
-      <p>Bạn muốn thử sức với Padel nhưng chưa biết bắt đầu từ đâu? Khóa học Padel Basic K12 chính là lựa chọn hoàn hảo dành cho bạn!</p>
-      <ul>
-        <li><strong>Giáo trình:</strong> 10 buổi (Mỗi buổi 90 phút)</li>
-        <li><strong>Nội dung:</strong> Luật chơi, cách tính điểm, kỹ thuật Forehand/Backhand cơ bản, luật bật tường (Wall play) và giao bóng.</li>
-        <li><strong>Giáo viên:</strong> HLV Quốc tế được cấp chứng nhận từ Padel Federation.</li>
-      </ul>
-      <p>Vui lòng liên hệ Hotline hoặc inbox Fanpage để đăng ký ngay. Giới hạn 4 học viên / lớp để đảm bảo chất lượng giảng dạy.</p>
-    `,
-    type: 'EVENT',
-    isPinned: false,
-    createdAt: new Date('2026-05-25T11:00:00Z'),
-    effectiveDate: new Date('2026-06-20T00:00:00Z')
-  }
-]
+import { prisma } from '@/lib/prisma'
+import { VENUE_ID } from '@/lib/constants'
 
 const getTypeStyle = (type) => {
   switch (type) {
@@ -132,13 +14,18 @@ const getTypeStyle = (type) => {
   }
 }
 
-export default function AnnouncementDetailPage() {
-  const params = useParams()
-  const slug = params?.slug // In thong-bao/page.js we pass id as slug parameter
+export default async function AnnouncementDetailPage({ params }) {
+  const { slug } = await params
 
-  const post = mockAnnouncements.find(a => a.id === slug)
+  if (!slug) notFound()
 
-  if (!post) {
+  const post = await prisma.announcement.findUnique({
+    where: { 
+      venueId_slug: { venueId: VENUE_ID, slug }
+    }
+  })
+
+  if (!post || !post.isActive || post.isDeleted) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center bg-[#FFFDF6]">
         <h1 className="text-4xl font-bold text-[#111111] mb-4">404 - Không tìm thấy</h1>
@@ -151,7 +38,6 @@ export default function AnnouncementDetailPage() {
   }
 
   const typeStyle = getTypeStyle(post.type)
-  const relatedPosts = mockAnnouncements.filter(a => a.id !== post.id).slice(0, 3)
 
   return (
     <div className="py-12 md:py-24 bg-[#FFFDF6] min-h-screen">
@@ -209,9 +95,6 @@ export default function AnnouncementDetailPage() {
 
           {/* Body */}
           <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-headings:text-[#111111] prose-p:text-[#555555] prose-p:leading-[1.8] prose-li:text-[#555555] prose-strong:text-[#111111]">
-            <p className="text-xl text-[#111111] font-medium leading-relaxed mb-10">
-              {post.excerpt}
-            </p>
             <div dangerouslySetInnerHTML={{ __html: post.content }} />
           </div>
 

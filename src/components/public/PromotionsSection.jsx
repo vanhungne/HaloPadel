@@ -4,10 +4,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { formatDate } from '@/lib/utils'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { localize, localizeStrict } from '@/lib/i18n/localize'
 
 export default function PromotionsSection({ section, promotions = [] }) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
+  const { t, locale } = useLanguage()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,13 +37,13 @@ export default function PromotionsSection({ section, promotions = [] }) {
         {/* Section Header */}
         <div className="text-center mb-10 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
-            Khuyến mãi sân padel
+            {t.promotions.sectionLabel}
           </p>
           <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
-            {section?.title || 'Ưu đãi tại HaloPadel'}
+            {localizeStrict(section, 'title', locale) || t.promotions.sectionTitle}
           </h2>
           <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            {section?.subtitle || 'Ưu đãi khai trương và gói chơi tiết kiệm dành cho khách hàng.'}
+            {localizeStrict(section, 'subtitle', locale) || t.promotions.sectionSubtitle}
           </p>
         </div>
 
@@ -70,7 +73,7 @@ export default function PromotionsSection({ section, promotions = [] }) {
                       <svg className="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      KHUYẾN MÃI ĐẶC BIỆT
+                      {t.promotions.specialPromo}
                     </div>
                   )}
                 </div>
@@ -80,10 +83,10 @@ export default function PromotionsSection({ section, promotions = [] }) {
                 <div className="p-6 md:p-8 flex-1 flex flex-col justify-between bg-white relative z-10">
                   <div>
                     <h3 className="font-heading text-2xl md:text-[28px] font-bold text-[#111111] group-hover:text-[#D45A2A] transition-colors mb-4 leading-tight">
-                      {promo1.title}
+                      {localize(promo1, 'title', locale)}
                     </h3>
                     <p className="text-[#555555] text-[15px] md:text-[16px] leading-relaxed mb-6 max-w-xl">
-                      {promo1.shortDesc}
+                      {localize(promo1, 'shortDesc', locale)}
                     </p>
                   </div>
                   
@@ -94,7 +97,7 @@ export default function PromotionsSection({ section, promotions = [] }) {
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        Áp dụng đến: {formatDate(promo1.endDate)}
+                        {t.common.validUntil} {formatDate(promo1.endDate)}
                       </div>
                     ) : <div/>}
                     
@@ -103,7 +106,7 @@ export default function PromotionsSection({ section, promotions = [] }) {
                       href={`/khuyen-mai/${promo1.slug}`}
                       className="inline-flex items-center justify-center gap-2 h-[48px] px-8 bg-[#111111] hover:bg-[#D45A2A] text-white rounded-xl font-bold text-[15px] transition-colors shadow-md hover:shadow-lg w-full sm:w-auto"
                     >
-                      {promo1.ctaText || 'Nhận ưu đãi ngay'}
+                      {localize(promo1, 'ctaText', locale) || t.common.getOfferNow}
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
@@ -133,7 +136,7 @@ export default function PromotionsSection({ section, promotions = [] }) {
                   {/* Badge */}
                   {promo2.isFeatured && (
                     <div className="absolute top-4 left-4 px-3.5 py-1.5 bg-[#111111] text-white text-[12px] font-bold uppercase tracking-widest rounded-lg shadow-lg">
-                      ƯU ĐÃI THÊM
+                      {t.promotions.bonusOffer}
                     </div>
                   )}
                 </div>
@@ -142,10 +145,10 @@ export default function PromotionsSection({ section, promotions = [] }) {
                 <div className="p-6 md:p-8 flex-1 flex flex-col justify-between bg-white relative z-10">
                   <div>
                     <h3 className="font-heading text-xl md:text-2xl font-bold text-[#111111] group-hover:text-[#D45A2A] transition-colors mb-3 leading-tight">
-                      {promo2.title}
+                      {localize(promo2, 'title', locale)}
                     </h3>
                     <p className="text-[#555555] text-[14px] md:text-[15px] leading-relaxed mb-6">
-                      {promo2.shortDesc}
+                      {localize(promo2, 'shortDesc', locale)}
                     </p>
                   </div>
                   
@@ -156,7 +159,7 @@ export default function PromotionsSection({ section, promotions = [] }) {
                         <svg className="w-4 h-4 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        Áp dụng đến: {formatDate(promo2.endDate)}
+                        {t.common.validUntil} {formatDate(promo2.endDate)}
                       </div>
                     )}
                     
@@ -165,7 +168,7 @@ export default function PromotionsSection({ section, promotions = [] }) {
                       href={`/khuyen-mai/${promo2.slug}`}
                       className="inline-flex items-center justify-center gap-2 h-[44px] px-6 bg-transparent border-2 border-[#111111] hover:border-[#D45A2A] text-[#111111] hover:text-[#D45A2A] hover:bg-[#D45A2A]/5 rounded-xl font-bold text-[14px] transition-all w-full"
                     >
-                      {promo2.ctaText || 'Xem chi tiết'}
+                      {localize(promo2, 'ctaText', locale) || t.common.viewDetails}
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                       </svg>

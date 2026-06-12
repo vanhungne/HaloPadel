@@ -49,6 +49,9 @@ export async function createBlogPost(data) {
         seoTitle: data.seoTitle || data.title,
         seoDescription: data.seoDescription || data.excerpt || '',
         showOnHomepage: data.showOnHomepage !== undefined ? data.showOnHomepage : false,
+        titleEn: data.titleEn || null,
+        excerptEn: data.excerptEn || null,
+        contentEn: data.contentEn || null,
       }
     })
     revalidatePath('/admin/blog')
@@ -75,6 +78,9 @@ export async function updateBlogPost(id, data) {
         seoTitle: data.seoTitle,
         seoDescription: data.seoDescription,
         showOnHomepage: data.showOnHomepage,
+        titleEn: data.titleEn || null,
+        excerptEn: data.excerptEn || null,
+        contentEn: data.contentEn || null,
       }
     })
     revalidatePath('/admin/blog')

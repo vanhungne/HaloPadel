@@ -1,12 +1,18 @@
+'use client'
+
+import { useLanguage } from '@/components/providers/LanguageProvider'
+
 export default function QuickInfo({ venue }) {
+  const { t } = useLanguage()
+
   if (!venue) return null
 
-  let hoursValue = '06:00 – 22:00 hàng ngày'
+  let hoursValue = `06:00 – 22:00 ${t.common.everyDay}`
   try {
     if (venue.openingHours) {
       const parsed = JSON.parse(venue.openingHours)
       if (parsed.length > 0) {
-        hoursValue = `${parsed[0].open} – ${parsed[0].close} hàng ngày`
+        hoursValue = `${parsed[0].open} – ${parsed[0].close} ${t.common.everyDay}`
       }
     }
   } catch (e) {}
@@ -19,9 +25,9 @@ export default function QuickInfo({ venue }) {
           <circle cx="12" cy="10" r="3" />
         </svg>
       ),
-      label: 'Địa chỉ',
+      label: t.quickInfo.address,
       value: venue.address,
-      description: 'Đến trực tiếp để tham quan sân',
+      description: t.quickInfo.addressDesc,
       href: venue.googleMapsUrl,
       target: '_blank',
     },
@@ -33,7 +39,7 @@ export default function QuickInfo({ venue }) {
       ),
       label: 'Hotline',
       value: venue.hotline,
-      description: 'Tư vấn sân & hỗ trợ khách chơi',
+      description: t.quickInfo.hotlineDesc,
       href: venue.hotline ? `tel:${venue.hotline}` : null,
     },
     {
@@ -44,7 +50,7 @@ export default function QuickInfo({ venue }) {
       ),
       label: 'Zalo',
       value: venue.zalo ? `Zalo: ${venue.zalo}` : null,
-      description: 'Phản hồi nhanh trong giờ mở cửa',
+      description: t.quickInfo.zaloDesc,
       href: venue.zalo ? `https://zalo.me/${venue.zalo}` : null,
       target: '_blank',
     },
@@ -55,9 +61,9 @@ export default function QuickInfo({ venue }) {
           <polyline points="12 6 12 12 16 14" />
         </svg>
       ),
-      label: 'Giờ mở cửa',
+      label: t.quickInfo.openingHours,
       value: hoursValue,
-      description: 'Mở cửa tất cả các ngày trong tuần',
+      description: t.quickInfo.openingHoursDesc,
     },
   ].filter((item) => item.value)
 

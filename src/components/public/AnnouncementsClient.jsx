@@ -4,16 +4,19 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatDate } from '@/lib/utils'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { localize } from '@/lib/i18n/localize'
 
 export default function AnnouncementsClient({ announcements = [] }) {
   const [activeTab, setActiveTab] = useState('ALL')
+  const { t, locale } = useLanguage()
 
   const tabs = [
-    { id: 'ALL', label: 'Tất cả' },
-    { id: 'INFO', label: 'Lịch hoạt động' },
-    { id: 'EVENT', label: 'Sự kiện' },
-    { id: 'PROMO', label: 'Ưu đãi' },
-    { id: 'RULE', label: 'Quy định' }
+    { id: 'ALL', label: t.common.all },
+    { id: 'INFO', label: t.announcements.tabSchedule },
+    { id: 'EVENT', label: t.announcements.tabEvent },
+    { id: 'PROMO', label: t.announcements.tabPromo },
+    { id: 'RULE', label: t.announcements.tabRule }
   ]
 
   const filteredAnnouncements = announcements.filter(item => {
@@ -41,10 +44,10 @@ export default function AnnouncementsClient({ announcements = [] }) {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#111111] mb-4 uppercase tracking-wide">
-            THÔNG BÁO
+            {t.announcements.pageTitle}
           </h1>
           <p className="text-[#555555] text-lg">
-            Cập nhật lịch hoạt động, sự kiện và thông tin mới nhất từ HaloPadel
+            {t.announcements.pageSubtitle}
           </p>
         </div>
 
@@ -72,7 +75,7 @@ export default function AnnouncementsClient({ announcements = [] }) {
         {featuredItem && (
           <div className="mb-8">
             <Link 
-              href={`/thong-bao/${featuredItem.id}`}
+              href={`/thong-bao/${featuredItem.slug}`}
               className="block relative p-8 md:p-12 rounded-[28px] overflow-hidden group transition-transform hover:-translate-y-1"
               style={{
                 background: 'linear-gradient(135deg, #FFF9EE 0%, #FBEAD8 100%)',
@@ -92,17 +95,17 @@ export default function AnnouncementsClient({ announcements = [] }) {
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                       </svg>
-                      Ghim
+                      {t.announcements.pinned}
                     </span>
                     <span className="bg-[#D45A2A]/10 text-[#D45A2A] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                      THÔNG BÁO QUAN TRỌNG
+                      {t.announcements.importantNotice}
                     </span>
                   </div>
                   <h2 className="font-heading text-3xl md:text-4xl font-bold text-[#111111] mb-4 leading-tight group-hover:text-[#D45A2A] transition-colors">
-                    {featuredItem.title}
+                    {localize(featuredItem, 'title', locale)}
                   </h2>
                   <p className="text-[#555555] text-lg mb-6 leading-relaxed line-clamp-3">
-                    {featuredItem.excerpt || featuredItem.content?.substring(0, 150) + '...'}
+                    {localize(featuredItem, 'excerpt', locale) || featuredItem.content?.substring(0, 150) + '...'}
                   </p>
                   <div className="flex flex-wrap items-center gap-6">
                     {featuredItem.effectiveDate && (
@@ -110,11 +113,11 @@ export default function AnnouncementsClient({ announcements = [] }) {
                         <svg className="w-5 h-5 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        Áp dụng từ: {formatDate(featuredItem.effectiveDate)}
+                      {t.common.validFrom} {formatDate(featuredItem.effectiveDate)}
                       </div>
                     )}
                     <span className="inline-flex items-center justify-center bg-[#111111] hover:bg-[#D45A2A] text-white px-6 py-2.5 rounded-[12px] font-bold text-[14px] transition-colors shadow-md">
-                      Đọc thông báo
+                      {t.announcements.readAnnouncement}
                     </span>
                   </div>
                 </div>
@@ -130,7 +133,7 @@ export default function AnnouncementsClient({ announcements = [] }) {
             return (
               <Link
                 key={item.id}
-                href={`/thong-bao/${item.id}`}
+                href={`/thong-bao/${item.slug}`}
                 className="group flex flex-col md:flex-row gap-6 p-6 md:p-8 rounded-[20px] transition-all duration-300"
                 style={{
                   background: '#FFFDF7',
@@ -159,22 +162,22 @@ export default function AnnouncementsClient({ announcements = [] }) {
                     </span>
                   </div>
                   <h3 className="font-heading text-xl font-bold text-[#111111] mb-2 group-hover:text-[#D45A2A] transition-colors">
-                    {item.title}
+                    {localize(item, 'title', locale)}
                   </h3>
                   <p className="text-[#555555] text-[14px] line-clamp-2 mb-4">
-                    {item.excerpt || item.content?.substring(0, 100) + '...'}
+                    {localize(item, 'excerpt', locale) || item.content?.substring(0, 100) + '...'}
                   </p>
                   
                   <div className="flex items-center justify-between mt-auto">
                     {item.effectiveDate ? (
                       <span className="text-[#111111] font-semibold text-[13px]">
-                        Áp dụng: <span className="text-[#D45A2A]">{formatDate(item.effectiveDate)}</span>
+                        {t.common.applied} <span className="text-[#D45A2A]">{formatDate(item.effectiveDate)}</span>
                       </span>
                     ) : (
                       <span/>
                     )}
                     <span className="text-[#D45A2A] font-bold text-[14px] flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Xem chi tiết <span aria-hidden="true">&rarr;</span>
+                      {t.common.viewDetails} <span aria-hidden="true">&rarr;</span>
                     </span>
                   </div>
                 </div>
@@ -186,7 +189,7 @@ export default function AnnouncementsClient({ announcements = [] }) {
         {filteredAnnouncements.length === 0 && (
           <div className="text-center py-20 bg-white rounded-[24px] border border-[#E8E2D2]">
             <span className="text-5xl mb-4 block">📭</span>
-            <p className="text-[#888888] text-lg">Chưa có thông báo nào trong danh mục này.</p>
+            <p className="text-[#888888] text-lg">{t.announcements.noAnnouncements}</p>
           </div>
         )}
 

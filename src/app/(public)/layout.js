@@ -1,6 +1,7 @@
 import Header from '@/components/public/Header'
 import Footer from '@/components/public/Footer'
 import FloatingCTA from '@/components/public/FloatingCTA'
+import { LanguageProvider } from '@/components/providers/LanguageProvider'
 import { prisma } from '@/lib/prisma'
 import { VENUE_ID } from '@/lib/constants'
 
@@ -14,7 +15,7 @@ export default async function PublicLayout({ children }) {
   const venue = await getVenue()
 
   return (
-    <>
+    <LanguageProvider>
       <Header venue={venue} />
       <main className="flex-1" style={{ paddingTop: '72px' }}>
         <div className="md:pb-0 pb-[72px]">
@@ -23,6 +24,7 @@ export default async function PublicLayout({ children }) {
       </main>
       <Footer venue={venue} />
       <FloatingCTA venue={venue} />
-    </>
+    </LanguageProvider>
   )
 }
+

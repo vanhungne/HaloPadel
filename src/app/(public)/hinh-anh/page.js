@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { VENUE_ID } from '@/lib/constants'
 import GalleryShowcase from '@/components/public/GalleryShowcase'
+import GalleryPageHeader from '@/components/public/GalleryPageHeader'
 import Image from 'next/image'
 
 import { getSeoMetadata, SchemaMarkup } from '@/lib/seo'
@@ -36,14 +37,7 @@ export default async function GalleryPage() {
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         
         {/* Page Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-[#111111] mb-4">
-            Hình ảnh sân
-          </h1>
-          <p className="text-[#555555] text-lg">
-            Khám phá không gian tập luyện đẳng cấp tại HaloPadel
-          </p>
-        </div>
+        <GalleryPageHeader />
 
         {/* Hero Section */}
         {heroImage && (

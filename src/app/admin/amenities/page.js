@@ -5,6 +5,7 @@ import { getAmenities, createAmenity, updateAmenity, deleteAmenity } from '@/act
 import Pagination from '@/components/admin/Pagination'
 import ConfirmModal from '@/components/admin/ConfirmModal'
 import ImageUpload from '@/components/admin/ImageUpload'
+import { LanguageTabs, TranslateButton, EnField } from '@/components/admin/TranslateTools'
 import { toast } from 'react-hot-toast'
 import { AMENITY_ICONS } from '@/lib/constants'
 
@@ -23,8 +24,12 @@ export default function AdminAmenitiesPage() {
     description: '',
     icon: 'star',
     image: '',
+    nameEn: '',
+    descriptionEn: '',
     isActive: true
   })
+
+  const [langTab, setLangTab] = useState('vi')
 
   const loadData = async (pageToLoad = page) => {
     setIsLoading(true)
@@ -40,8 +45,9 @@ export default function AdminAmenitiesPage() {
   }, [])
 
   const openAddModal = () => {
-    setFormData({ name: '', description: '', icon: 'star', image: '', isActive: true })
+    setFormData({ name: '', description: '', icon: 'star', image: '', nameEn: '', descriptionEn: '', isActive: true })
     setEditingId(null)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -51,9 +57,12 @@ export default function AdminAmenitiesPage() {
       description: amenity.description || '',
       icon: amenity.icon || 'star',
       image: amenity.image || '',
-      isActive: amenity.isActive
+      isActive: amenity.isActive,
+      nameEn: amenity.nameEn || '',
+      descriptionEn: amenity.descriptionEn || '',
     })
     setEditingId(amenity.id)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -190,7 +199,7 @@ export default function AdminAmenitiesPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#111111]/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[800px] overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-[800px] max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-[#E8E2D2] flex items-center justify-between bg-[#F8F5E4]/30">
               <h3 className="font-heading font-bold text-lg text-[#111111]">
                 {editingId ? 'Sửa tiện ích' : 'Thêm tiện ích mới'}
@@ -204,7 +213,7 @@ export default function AdminAmenitiesPage() {
                 </svg>
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 md:p-8">
+            <form onSubmit={handleSubmit} className="p-6 md:p-8 flex-1 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Cột trái */}
                 <div className="space-y-6">
@@ -265,6 +274,29 @@ export default function AdminAmenitiesPage() {
                     />
                   </div>
 
+                  {/* Language Tabs + Translation */}
+                  <LanguageTabs langTab={langTab} setLangTab={setLangTab} />
+                  
+                  {langTab === 'en' && (
+                    <div className="space-y-4">
+                      <EnField label="Name (English)" value={formData.nameEn} onChange={(e) => setFormData({...formData, nameEn: e.target.value})} viValue={formData.name} />
+                      <EnField label="Description (English)" value={formData.descriptionEn} onChange={(e) => setFormData({...formData, descriptionEn: e.target.value})} viValue={formData.description} multiline />
+                    </div>
+                  )}
+
+                  <TranslateButton
+                    viFields={{ name: formData.name, description: formData.description }}
+                    onTranslated={(data) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        nameEn: data.name || prev.nameEn,
+                        descriptionEn: data.description || prev.descriptionEn,
+                      }))
+                      setLangTab('en')
+                    }}
+                    disabled={!formData.name}
+                  />
+
                   <div className="flex items-center gap-3 pt-2 p-4 bg-[#F8F5E4]/50 rounded-xl border border-[#E8E2D2]/50 cursor-pointer hover:border-[#D45A2A]/50 transition-colors" onClick={() => setFormData({...formData, isActive: !formData.isActive})}>
                     <input 
                       type="checkbox" 
@@ -280,22 +312,23 @@ export default function AdminAmenitiesPage() {
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-3 border-t border-[#E8E2D2] mt-8">
-                <button 
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-4 py-3 bg-[#F8F5E4] hover:bg-[#E8E2D2] text-[#555555] rounded-xl font-bold transition-colors"
-                >
-                  Hủy bỏ
-                </button>
-                <button 
-                  type="submit"
-                  className="flex-1 px-4 py-3 bg-[#D45A2A] hover:bg-[#B8431D] text-white rounded-xl font-bold transition-colors shadow-md hover:shadow-lg"
-                >
-                  {editingId ? 'Lưu thay đổi' : 'Thêm mới'}
-                </button>
-              </div>
             </form>
+            <div className="px-6 md:px-8 py-4 flex gap-3 border-t border-[#E8E2D2] shrink-0 bg-white">
+              <button 
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 px-4 py-3 bg-[#F8F5E4] hover:bg-[#E8E2D2] text-[#555555] rounded-xl font-bold transition-colors"
+              >
+                Hủy bỏ
+              </button>
+              <button 
+                type="button"
+                onClick={handleSubmit}
+                className="flex-1 px-4 py-3 bg-[#D45A2A] hover:bg-[#B8431D] text-white rounded-xl font-bold transition-colors shadow-md hover:shadow-lg"
+              >
+                {editingId ? 'Lưu thay đổi' : 'Thêm mới'}
+              </button>
+            </div>
           </div>
         </div>
       )}

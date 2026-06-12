@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { getPromotions, createPromotion, updatePromotion, deletePromotion } from '@/actions/promotions'
 import ImageUpload from '@/components/admin/ImageUpload'
 import Pagination from '@/components/admin/Pagination'
+import { LanguageTabs, TranslateButton, EnField } from '@/components/admin/TranslateTools'
 import { formatDate } from '@/lib/utils'
 
 export default function AdminPromotionsPage() {
@@ -23,10 +24,16 @@ export default function AdminPromotionsPage() {
     conditions: '',
     ctaText: 'Nhận ưu đãi',
     ctaUrl: '/lien-he',
+    titleEn: '',
+    shortDescEn: '',
+    contentEn: '',
+    ctaTextEn: '',
     isActive: true,
     showOnHomepage: false,
     displayOrder: 0
   })
+
+  const [langTab, setLangTab] = useState('vi')
 
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -49,9 +56,11 @@ export default function AdminPromotionsPage() {
       title: '', banner: '', shortDesc: '', content: '', 
       startDate: '', endDate: '', conditions: '', 
       ctaText: 'Nhận ưu đãi', ctaUrl: '/lien-he', 
+      titleEn: '', shortDescEn: '', contentEn: '', ctaTextEn: '',
       isActive: true, showOnHomepage: false, displayOrder: 0 
     })
     setEditingId(null)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -68,9 +77,14 @@ export default function AdminPromotionsPage() {
       ctaUrl: item.ctaUrl || '/lien-he',
       isActive: item.isActive,
       showOnHomepage: item.showOnHomepage,
-      displayOrder: item.displayOrder || 0
+      displayOrder: item.displayOrder || 0,
+      titleEn: item.titleEn || '',
+      shortDescEn: item.shortDescEn || '',
+      contentEn: item.contentEn || '',
+      ctaTextEn: item.ctaTextEn || '',
     })
     setEditingId(item.id)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -323,7 +337,7 @@ export default function AdminPromotionsPage() {
                 </div>
               </div>
 
-              {/* Right Column: Detailed Content */}
+              {/* Right Column: Content + Translation */}
               <div className="flex-1 flex flex-col min-w-0 bg-[#FAFAFA] p-0 lg:p-6 overflow-hidden">
                 <div className="flex-1 flex flex-col h-full bg-white lg:rounded-xl shadow-sm lg:border border-[#E8E2D2] overflow-hidden">
                   <div className="px-5 py-3 border-b border-[#E8E2D2] flex items-center justify-between bg-white">
@@ -331,27 +345,53 @@ export default function AdminPromotionsPage() {
                       <label className="block text-[15px] font-bold text-[#111111]">Nội dung chi tiết chương trình</label>
                       <p className="text-[12px] text-[#888888] font-medium">Chi tiết về ưu đãi, cách thức tham gia, v.v.</p>
                     </div>
+                    <LanguageTabs langTab={langTab} setLangTab={setLangTab} />
                   </div>
                   <div className="flex-1 min-h-0 overflow-y-auto p-5 space-y-6">
-                    <div>
-                      <textarea 
-                        rows={12}
-                        value={formData.content}
-                        onChange={(e) => setFormData({...formData, content: e.target.value})}
-                        className="w-full px-4 py-3 bg-white border border-[#E8E2D2] focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all resize-none text-sm leading-relaxed"
-                        placeholder="Nhập nội dung chi tiết ở đây..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Điều kiện áp dụng</label>
-                      <textarea 
-                        rows={4}
-                        value={formData.conditions}
-                        onChange={(e) => setFormData({...formData, conditions: e.target.value})}
-                        className="w-full px-4 py-3 bg-white border border-[#E8E2D2] focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all resize-none text-sm leading-relaxed"
-                        placeholder="Vd: Không áp dụng kèm các CTKM khác..."
-                      />
-                    </div>
+                    {langTab === 'vi' ? (
+                      <>
+                        <div>
+                          <textarea 
+                            rows={12}
+                            value={formData.content}
+                            onChange={(e) => setFormData({...formData, content: e.target.value})}
+                            className="w-full px-4 py-3 bg-white border border-[#E8E2D2] focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all resize-none text-sm leading-relaxed"
+                            placeholder="Nhập nội dung chi tiết ở đây..."
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Điều kiện áp dụng</label>
+                          <textarea 
+                            rows={4}
+                            value={formData.conditions}
+                            onChange={(e) => setFormData({...formData, conditions: e.target.value})}
+                            className="w-full px-4 py-3 bg-white border border-[#E8E2D2] focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all resize-none text-sm leading-relaxed"
+                            placeholder="Vd: Không áp dụng kèm các CTKM khác..."
+                          />
+                        </div>
+                        <TranslateButton
+                          viFields={{ title: formData.title, shortDesc: formData.shortDesc, content: formData.content, ctaText: formData.ctaText }}
+                          onTranslated={(data) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              titleEn: data.title || prev.titleEn,
+                              shortDescEn: data.shortDesc || prev.shortDescEn,
+                              contentEn: data.content || prev.contentEn,
+                              ctaTextEn: data.ctaText || prev.ctaTextEn,
+                            }))
+                            setLangTab('en')
+                          }}
+                          disabled={!formData.title}
+                        />
+                      </>
+                    ) : (
+                      <div className="space-y-5">
+                        <EnField label="Title (English)" value={formData.titleEn} onChange={(e) => setFormData({...formData, titleEn: e.target.value})} viValue={formData.title} />
+                        <EnField label="Short Description (English)" value={formData.shortDescEn} onChange={(e) => setFormData({...formData, shortDescEn: e.target.value})} viValue={formData.shortDesc} multiline />
+                        <EnField label="Content (English)" value={formData.contentEn} onChange={(e) => setFormData({...formData, contentEn: e.target.value})} viValue={formData.content?.substring(0, 100)} multiline />
+                        <EnField label="CTA Text (English)" value={formData.ctaTextEn} onChange={(e) => setFormData({...formData, ctaTextEn: e.target.value})} viValue={formData.ctaText} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

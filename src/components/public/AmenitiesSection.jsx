@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { localize, localizeStrict } from '@/lib/i18n/localize'
 
 const PHOTO_AMENITIES = [
   {
@@ -54,6 +56,7 @@ const PHOTO_AMENITIES = [
 export default function AmenitiesSection({ amenities, section }) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
+  const { t, locale } = useLanguage()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -77,13 +80,13 @@ export default function AmenitiesSection({ amenities, section }) {
         {/* Header */}
         <div className="text-center mb-10 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
-            Tiện ích sân
+            {t.amenities.sectionLabel}
           </p>
           <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-3 md:mb-4">
-            {section?.title || 'Dịch vụ & Tiện ích'}
+            {localizeStrict(section, 'title', locale) || t.amenities.sectionTitle}
           </h2>
           <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            {section?.subtitle || 'Trải nghiệm không gian thể thao cao cấp với đầy đủ tiện nghi, đáp ứng mọi nhu cầu của bạn từ lúc đến cho tới khi kết thúc trận đấu.'}
+            {localizeStrict(section, 'subtitle', locale) || t.amenities.sectionSubtitle}
           </p>
         </div>
 
@@ -108,7 +111,7 @@ export default function AmenitiesSection({ amenities, section }) {
                 Premium Club
               </span>
               <h3 className="font-heading text-3xl md:text-[2.5rem] font-bold !text-white leading-tight">
-                Không gian <br/>tiện nghi trọn vẹn
+                {t.amenities.heroOverlayTitle} <br/>{t.amenities.heroOverlayTitleBr}
               </h3>
             </div>
           </div>
@@ -142,10 +145,10 @@ export default function AmenitiesSection({ amenities, section }) {
                   {/* Content Half */}
                   <div className="p-7">
                     <h4 className="text-[18px] font-bold text-[#111111] mb-2 group-hover:text-[#D45A2A] transition-colors">
-                      {item.name}
+                      {localize(item, 'name', locale)}
                     </h4>
                     <p className="text-[#555555] text-[14px] leading-relaxed">
-                      {item.description}
+                      {localize(item, 'description', locale)}
                     </p>
                   </div>
                 </div>

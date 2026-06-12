@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { VENUE_ID } from '@/lib/constants'
 import GoogleMap from '@/components/public/GoogleMap'
+import ContactPageHeader from '@/components/public/ContactPageHeader'
 
 import { getSeoMetadata, SchemaMarkup } from '@/lib/seo'
 
@@ -26,21 +27,11 @@ export default async function ContactPage() {
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         
         {/* Page Header */}
-        <div className="text-center max-w-3xl mx-auto mb-4">
-          <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
-            HaloPadel Sports Club
-          </p>
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-[#111111] mb-4">
-            Liên hệ với chúng tôi
-          </h1>
-          <p className="text-[#555555] text-lg">
-            Chúng tôi luôn sẵn sàng hỗ trợ bạn. Vui lòng liên hệ qua các kênh dưới đây hoặc trực tiếp đến sân.
-          </p>
-        </div>
+        <ContactPageHeader />
 
         {/* Map & Contact Info Component */}
         <div className="mt-[-40px]">
-          <GoogleMap venue={venue} section={{ title: 'Vị trí sân', subtitle: 'Tìm đường đi ngắn nhất đến với HaloPadel Đà Nẵng' }} />
+          <GoogleMap venue={venue} />
         </div>
       </div>
     </div>

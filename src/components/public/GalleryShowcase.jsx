@@ -2,17 +2,19 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function GalleryShowcase({ images }) {
+  const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState('ALL')
   const [lightboxIndex, setLightboxIndex] = useState(null)
 
   const tabs = [
-    { id: 'ALL', label: 'Tất cả' },
-    { id: 'GALLERY', label: 'Không gian' },
-    { id: 'COURT', label: 'Sân đấu' },
-    { id: 'AMENITY', label: 'Lounge & Tiện ích' },
-    { id: 'HERO', label: 'Banner' },
+    { id: 'ALL', label: t.gallery.tabAll },
+    { id: 'GALLERY', label: t.gallery.tabSpace },
+    { id: 'COURT', label: t.gallery.tabCourt },
+    { id: 'AMENITY', label: t.gallery.tabAmenity },
+    { id: 'HERO', label: t.gallery.tabBanner },
   ]
 
   // Filter images based on active tab
@@ -39,7 +41,7 @@ export default function GalleryShowcase({ images }) {
     if (filteredImages.length === 0) return (
       <div className="text-center py-20">
         <span className="text-6xl mb-4 block">🖼️</span>
-        <p className="text-[#888888] text-lg">Hình ảnh đang được cập nhật...</p>
+        <p className="text-[#888888] text-lg">{t.gallery.updating}</p>
       </div>
     )
 

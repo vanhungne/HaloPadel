@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { getPricingPlans, createPricingPlan, updatePricingPlan, deletePricingPlan } from '@/actions/pricing'
+import { translateToEnglish } from '@/actions/ai/translateContent'
 import Pagination from '@/components/admin/Pagination'
 
 export default function AdminPricingPage() {
@@ -17,12 +18,19 @@ export default function AdminPricingPage() {
   const [startTime, setStartTime] = useState('06:00')
   const [endTime, setEndTime] = useState('22:00')
 
+  // Language tab state
+  const [langTab, setLangTab] = useState('vi')
+  const [isTranslating, setIsTranslating] = useState(false)
+
   const [formData, setFormData] = useState({
     name: '',
     price: '',
     timeSlot: '',
     description: '',
     notes: '',
+    nameEn: '',
+    descriptionEn: '',
+    notesEn: '',
     isActive: true
   })
 
@@ -40,11 +48,12 @@ export default function AdminPricingPage() {
   }, [])
 
   const openAddModal = () => {
-    setFormData({ name: '', price: '', timeSlot: '06:00 - 22:00', description: '', notes: '', isActive: true })
+    setFormData({ name: '', price: '', timeSlot: '06:00 - 22:00', description: '', notes: '', nameEn: '', descriptionEn: '', notesEn: '', isActive: true })
     setIsFlexibleTime(false)
     setStartTime('06:00')
     setEndTime('22:00')
     setEditingId(null)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -71,9 +80,13 @@ export default function AdminPricingPage() {
       timeSlot: plan.timeSlot || '',
       description: plan.description || '',
       notes: plan.notes || '',
+      nameEn: plan.nameEn || '',
+      descriptionEn: plan.descriptionEn || '',
+      notesEn: plan.notesEn || '',
       isActive: plan.isActive
     })
     setEditingId(plan.id)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -94,6 +107,37 @@ export default function AdminPricingPage() {
       } else {
         alert(res?.error || 'Lỗi khi xóa')
       }
+    }
+  }
+
+  const handleTranslate = async () => {
+    if (!formData.name && !formData.description && !formData.notes) {
+      alert('Vui lòng nhập nội dung tiếng Việt trước khi dịch.')
+      return
+    }
+    setIsTranslating(true)
+    try {
+      const fieldsToTranslate = {}
+      if (formData.name) fieldsToTranslate.name = formData.name
+      if (formData.description) fieldsToTranslate.description = formData.description
+      if (formData.notes) fieldsToTranslate.notes = formData.notes
+
+      const res = await translateToEnglish(fieldsToTranslate)
+      if (res.success && res.data) {
+        setFormData(prev => ({
+          ...prev,
+          nameEn: res.data.name || prev.nameEn,
+          descriptionEn: res.data.description || prev.descriptionEn,
+          notesEn: res.data.notes || prev.notesEn,
+        }))
+        setLangTab('en') // Switch to EN tab to review
+      } else {
+        alert(res.error || 'Lỗi khi dịch')
+      }
+    } catch (err) {
+      alert('Lỗi: ' + err.message)
+    } finally {
+      setIsTranslating(false)
     }
   }
 
@@ -150,6 +194,7 @@ export default function AdminPricingPage() {
               <th className="py-4 px-6 text-[12px] font-bold text-[#888888] uppercase tracking-wider w-[35%]">Tên bảng giá</th>
               <th className="py-4 px-6 text-[12px] font-bold text-[#888888] uppercase tracking-wider">Mức giá</th>
               <th className="py-4 px-6 text-[12px] font-bold text-[#888888] uppercase tracking-wider">Khung giờ</th>
+              <th className="py-4 px-6 text-[12px] font-bold text-[#888888] uppercase tracking-wider text-center">EN</th>
               <th className="py-4 px-6 text-[12px] font-bold text-[#888888] uppercase tracking-wider text-center">Trạng thái</th>
               <th className="py-4 px-6 text-[12px] font-bold text-[#888888] uppercase tracking-wider text-right">Thao tác</th>
             </tr>
@@ -157,7 +202,7 @@ export default function AdminPricingPage() {
           <tbody className="divide-y divide-[#E8E2D2]">
             {plans.length === 0 ? (
               <tr>
-                <td colSpan="5" className="py-12 text-center text-[#888888]">Chưa có dữ liệu bảng giá</td>
+                <td colSpan="6" className="py-12 text-center text-[#888888]">Chưa có dữ liệu bảng giá</td>
               </tr>
             ) : (
               plans.map(item => (
@@ -187,6 +232,13 @@ export default function AdminPricingPage() {
                       </svg>
                       {item.timeSlot}
                     </span>
+                  </td>
+                  <td className="py-4 px-6 text-center">
+                    {item.nameEn ? (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700 border border-blue-200">🇬🇧 OK</span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-[11px] font-bold bg-gray-100 text-gray-400">—</span>
+                    )}
                   </td>
                   <td className="py-4 px-6 text-center">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase ${
@@ -250,85 +302,193 @@ export default function AdminPricingPage() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Tên gói / Bảng giá <span className="text-red-500">*</span></label>
-                  <input 
-                    type="text" 
-                    name="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-medium"
-                    placeholder="Vd: Giờ hành chính, Cuối tuần..."
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Mức giá</label>
-                  <input 
-                    type="text" 
-                    name="price"
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-bold text-[#D45A2A]"
-                    placeholder="Vd: 500.000đ/giờ"
-                  />
-                </div>
+              {/* Language Tabs */}
+              <div className="flex items-center gap-2 p-1 bg-[#F8F5E4] rounded-xl w-fit">
+                <button
+                  type="button"
+                  onClick={() => setLangTab('vi')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold transition-all ${
+                    langTab === 'vi' 
+                      ? 'bg-white text-[#111111] shadow-sm' 
+                      : 'text-[#888888] hover:text-[#555555]'
+                  }`}
+                >
+                  🇻🇳 Tiếng Việt
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLangTab('en')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold transition-all ${
+                    langTab === 'en' 
+                      ? 'bg-white text-[#111111] shadow-sm' 
+                      : 'text-[#888888] hover:text-[#555555]'
+                  }`}
+                >
+                  🇬🇧 English
+                </button>
+              </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-[13px] font-bold text-[#111111]">Khung giờ áp dụng</label>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="isFlexibleTime"
-                        checked={isFlexibleTime}
-                        onChange={(e) => setIsFlexibleTime(e.target.checked)}
-                        className="rounded border-[#E8E2D2] text-[#D45A2A] focus:ring-[#D45A2A]/50 cursor-pointer"
-                      />
-                      <label htmlFor="isFlexibleTime" className="text-[12px] text-[#555555] cursor-pointer select-none">Linh hoạt</label>
-                    </div>
-                  </div>
-                  
-                  {isFlexibleTime ? (
+              {/* Vietnamese Fields */}
+              {langTab === 'vi' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Tên gói / Bảng giá <span className="text-red-500">*</span></label>
                     <input 
                       type="text" 
-                      disabled
-                      value="Linh hoạt"
-                      className="w-full px-4 py-3 bg-[#E8E2D2]/50 border border-[#E8E2D2] rounded-xl text-[#888888] outline-none font-medium cursor-not-allowed"
+                      name="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-medium"
+                      placeholder="Vd: Giờ hành chính, Cuối tuần..."
                     />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="time" 
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                        className="flex-1 px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-mono"
-                      />
-                      <span className="text-[#888888] font-medium">-</span>
-                      <input 
-                        type="time" 
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        className="flex-1 px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-mono"
-                      />
-                    </div>
-                  )}
-                </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Mức giá</label>
+                    <input 
+                      type="text" 
+                      name="price"
+                      value={formData.price}
+                      onChange={(e) => setFormData({...formData, price: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-bold text-[#D45A2A]"
+                      placeholder="Vd: 500.000đ/giờ"
+                    />
+                  </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Mô tả thêm</label>
-                  <textarea 
-                    name="description"
-                    rows={2}
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all resize-none"
-                    placeholder="Vd: Áp dụng cho hội viên VIP..."
-                  />
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-[13px] font-bold text-[#111111]">Khung giờ áp dụng</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          id="isFlexibleTime"
+                          checked={isFlexibleTime}
+                          onChange={(e) => setIsFlexibleTime(e.target.checked)}
+                          className="rounded border-[#E8E2D2] text-[#D45A2A] focus:ring-[#D45A2A]/50 cursor-pointer"
+                        />
+                        <label htmlFor="isFlexibleTime" className="text-[12px] text-[#555555] cursor-pointer select-none">Linh hoạt</label>
+                      </div>
+                    </div>
+                    
+                    {isFlexibleTime ? (
+                      <input 
+                        type="text" 
+                        disabled
+                        value="Linh hoạt"
+                        className="w-full px-4 py-3 bg-[#E8E2D2]/50 border border-[#E8E2D2] rounded-xl text-[#888888] outline-none font-medium cursor-not-allowed"
+                      />
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="time" 
+                          value={startTime}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          className="flex-1 px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-mono"
+                        />
+                        <span className="text-[#888888] font-medium">-</span>
+                        <input 
+                          type="time" 
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          className="flex-1 px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all font-mono"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Mô tả thêm</label>
+                    <textarea 
+                      name="description"
+                      rows={2}
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all resize-none"
+                      placeholder="Vd: Áp dụng cho hội viên VIP..."
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Ghi chú</label>
+                    <input 
+                      type="text"
+                      name="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E2D2] focus:bg-white focus:border-[#D45A2A] rounded-xl text-[#111111] outline-none transition-all"
+                      placeholder="Vd: Áp dụng tất cả các ngày, Thứ 2 - Thứ 6..."
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* English Fields */}
+              {langTab === 'en' && (
+                <div className="grid grid-cols-1 gap-6">
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Name (English)</label>
+                    <input 
+                      type="text"
+                      value={formData.nameEn}
+                      onChange={(e) => setFormData({...formData, nameEn: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#F0F7FF] border border-blue-200 focus:bg-white focus:border-blue-400 rounded-xl text-[#111111] outline-none transition-all font-medium"
+                      placeholder="e.g. Morning, Business Hours..."
+                    />
+                    {formData.name && (
+                      <p className="text-[12px] text-[#888888] mt-1">🇻🇳 {formData.name}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Description (English)</label>
+                    <textarea
+                      rows={2}
+                      value={formData.descriptionEn}
+                      onChange={(e) => setFormData({...formData, descriptionEn: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#F0F7FF] border border-blue-200 focus:bg-white focus:border-blue-400 rounded-xl text-[#111111] outline-none transition-all resize-none"
+                      placeholder="English description..."
+                    />
+                    {formData.description && (
+                      <p className="text-[12px] text-[#888888] mt-1">🇻🇳 {formData.description}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#111111] mb-1.5">Notes (English)</label>
+                    <input
+                      type="text"
+                      value={formData.notesEn}
+                      onChange={(e) => setFormData({...formData, notesEn: e.target.value})}
+                      className="w-full px-4 py-3 bg-[#F0F7FF] border border-blue-200 focus:bg-white focus:border-blue-400 rounded-xl text-[#111111] outline-none transition-all"
+                      placeholder="e.g. Available every day, Mon - Fri..."
+                    />
+                    {formData.notes && (
+                      <p className="text-[12px] text-[#888888] mt-1">🇻🇳 {formData.notes}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* AI Translate Button */}
+              <button
+                type="button"
+                onClick={handleTranslate}
+                disabled={isTranslating || (!formData.name && !formData.description && !formData.notes)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl font-bold text-[14px] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+              >
+                {isTranslating ? (
+                  <>
+                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Đang dịch...
+                  </>
+                ) : (
+                  <>
+                    🤖 Dịch sang English (AI)
+                  </>
+                )}
+              </button>
 
               <div className="flex items-center gap-3 pt-2 p-4 bg-[#F8F5E4]/50 rounded-xl border border-[#E8E2D2]/50 cursor-pointer hover:border-[#D45A2A]/50 transition-colors" onClick={() => setFormData({...formData, isActive: !formData.isActive})}>
                 <input 

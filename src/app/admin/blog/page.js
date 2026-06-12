@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { getBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost } from '@/actions/blog'
+import { generateBlogContentWithAI } from '@/actions/ai/generateBlogContent'
 import ImageUpload from '@/components/admin/ImageUpload'
 import MarkdownEditor from '@/components/admin/MarkdownEditor'
 import Pagination from '@/components/admin/Pagination'
+import { LanguageTabs, TranslateButton, EnField } from '@/components/admin/TranslateTools'
 import { formatDate } from '@/lib/utils'
 
 export default function AdminBlogPage() {
@@ -22,8 +24,20 @@ export default function AdminBlogPage() {
     status: 'PUBLISHED',
     seoTitle: '',
     seoDescription: '',
-    showOnHomepage: false
+    showOnHomepage: false,
+    coverImagePrompt: '',
+    titleEn: '',
+    excerptEn: '',
+    contentEn: '',
   })
+
+  const [langTab, setLangTab] = useState('vi')
+
+  // AI State
+  const [showAiInput, setShowAiInput] = useState(false)
+  const [aiIdea, setAiIdea] = useState('')
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false)
+  const [aiProgressMessage, setAiProgressMessage] = useState('')
 
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -44,9 +58,13 @@ export default function AdminBlogPage() {
   const openAddModal = () => {
     setFormData({ 
       title: '', excerpt: '', content: '', coverImage: '', 
-      status: 'PUBLISHED', seoTitle: '', seoDescription: '', showOnHomepage: false 
+      status: 'PUBLISHED', seoTitle: '', seoDescription: '', showOnHomepage: false, coverImagePrompt: '',
+      titleEn: '', excerptEn: '', contentEn: '',
     })
     setEditingId(null)
+    setShowAiInput(false)
+    setAiIdea('')
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -59,9 +77,14 @@ export default function AdminBlogPage() {
       status: item.status || 'DRAFT',
       seoTitle: item.seoTitle || '',
       seoDescription: item.seoDescription || '',
-      showOnHomepage: item.showOnHomepage
+      showOnHomepage: item.showOnHomepage,
+      coverImagePrompt: '',
+      titleEn: item.titleEn || '',
+      excerptEn: item.excerptEn || '',
+      contentEn: item.contentEn || '',
     })
     setEditingId(item.id)
+    setLangTab('vi')
     setIsModalOpen(true)
   }
 
@@ -90,6 +113,44 @@ export default function AdminBlogPage() {
       loadData()
     } else {
       alert(res?.error || 'Lỗi lưu dữ liệu')
+    }
+  }
+
+  const handleGenerateAI = async () => {
+    if (!aiIdea.trim()) return alert('Vui lòng nhập ý tưởng bài viết!')
+    
+    setIsGeneratingAI(true)
+    setAiProgressMessage('Đang chọn API key và gửi yêu cầu tới Groq...')
+    
+    try {
+      const res = await generateBlogContentWithAI(aiIdea)
+      if (res.success) {
+        setAiProgressMessage('Đang xử lý nội dung và hình ảnh...')
+        const data = res.data
+        
+        // Tự động điền form
+        setFormData(prev => ({
+          ...prev,
+          title: data.title || prev.title,
+          excerpt: data.excerpt || prev.excerpt,
+          content: data.markdownContent || data.content || prev.content,
+          seoTitle: data.seoTitle || prev.seoTitle,
+          seoDescription: data.seoDescription || prev.seoDescription,
+          coverImage: data.coverImageUrl || prev.coverImage,
+          coverImagePrompt: data.coverImagePrompt || '',
+          status: 'DRAFT' // Mặc định bài AI tạo ra phải ở trạng thái nháp
+        }))
+        
+        setShowAiInput(false)
+        setAiIdea('')
+      } else {
+        alert('Lỗi AI: ' + res.error)
+      }
+    } catch (err) {
+      alert('Đã xảy ra lỗi hệ thống khi gọi AI.')
+    } finally {
+      setIsGeneratingAI(false)
+      setAiProgressMessage('')
     }
   }
 
@@ -213,6 +274,73 @@ export default function AdminBlogPage() {
               </button>
             </div>
             
+            {/* AI Generator Banner */}
+            {!editingId && (
+              <div className="bg-[#FFF9EE] border-b border-[#E8E2D2] px-6 py-4 flex flex-col sm:flex-row items-center gap-4 shrink-0">
+                {!showAiInput ? (
+                  <>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-[#D45A2A] flex items-center gap-2 text-sm">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Viết bài tự động bằng AI (Groq)
+                      </h4>
+                      <p className="text-xs text-[#555555] mt-1">Hệ thống sẽ tự động tạo bài viết chuẩn SEO, hình ảnh và điền vào form bên dưới.</p>
+                    </div>
+                    <button 
+                      onClick={() => setShowAiInput(true)}
+                      className="px-4 py-2 bg-gradient-to-r from-[#D45A2A] to-[#B8431D] text-white rounded-xl font-bold text-sm shadow hover:shadow-lg transition-all flex items-center gap-2 whitespace-nowrap"
+                    >
+                      ✨ Viết bằng AI
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-full flex flex-col sm:flex-row gap-3 items-center">
+                    <input 
+                      type="text" 
+                      value={aiIdea}
+                      onChange={(e) => setAiIdea(e.target.value)}
+                      disabled={isGeneratingAI}
+                      placeholder="Nhập ý tưởng... (VD: Vì sao người mới nên chơi Padel?)" 
+                      className="flex-1 px-4 py-2 rounded-xl border border-[#E8E2D2] focus:border-[#D45A2A] outline-none w-full text-sm disabled:opacity-50"
+                      onKeyDown={(e) => e.key === 'Enter' && handleGenerateAI()}
+                    />
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button 
+                        onClick={() => setShowAiInput(false)}
+                        disabled={isGeneratingAI}
+                        className="px-4 py-2 text-[#555555] bg-white border border-[#E8E2D2] rounded-xl text-sm font-bold hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        Hủy
+                      </button>
+                      <button 
+                        onClick={handleGenerateAI}
+                        disabled={isGeneratingAI || !aiIdea.trim()}
+                        className="px-4 py-2 bg-[#D45A2A] text-white rounded-xl text-sm font-bold flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                      >
+                        {isGeneratingAI ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Đang xử lý...
+                          </>
+                        ) : '✨ Tạo bài viết'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isGeneratingAI && (
+              <div className="bg-blue-50 border-b border-blue-100 px-6 py-2 shrink-0 text-center text-sm font-medium text-blue-700 animate-pulse">
+                {aiProgressMessage}
+              </div>
+            )}
+
             <div className="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
               {/* Left Column: Post Settings */}
               <div className="w-full lg:w-[400px] shrink-0 border-r border-[#E8E2D2] bg-white overflow-y-auto p-6 space-y-6">
@@ -248,6 +376,14 @@ export default function AdminBlogPage() {
                     value={formData.coverImage}
                     onChange={(url) => setFormData({...formData, coverImage: url})}
                   />
+                  {formData.coverImagePrompt && (
+                    <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                      <label className="block text-[11px] font-bold text-blue-700 uppercase mb-1">
+                        Prompt ảnh bìa (Hãy copy lên Gemini tạo ảnh):
+                      </label>
+                      <p className="text-xs text-blue-800 italic">{formData.coverImagePrompt}</p>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -307,20 +443,48 @@ export default function AdminBlogPage() {
                 </div>
               </div>
 
-              {/* Right Column: Markdown Editor */}
+              {/* Right Column: Content Editor + Translation */}
               <div className="flex-1 flex flex-col min-w-0 bg-[#FAFAFA] p-0 lg:p-6 overflow-hidden">
                 <div className="flex-1 flex flex-col h-full bg-white lg:rounded-xl shadow-sm lg:border border-[#E8E2D2] overflow-hidden">
                   <div className="px-5 py-3 border-b border-[#E8E2D2] flex items-center justify-between bg-white">
                     <div>
-                      <label className="block text-[15px] font-bold text-[#111111]">Nội dung bài viết (Markdown)</label>
+                      <label className="block text-[15px] font-bold text-[#111111]">Nội dung bài viết</label>
                       <p className="text-[12px] text-[#888888] font-medium">Viết bằng Markdown, xem trước thời gian thực và chèn nhiều ảnh dễ dàng.</p>
                     </div>
+                    <LanguageTabs langTab={langTab} setLangTab={setLangTab} />
                   </div>
                   <div className="flex-1 min-h-0 overflow-hidden">
-                    <MarkdownEditor 
-                      value={formData.content}
-                      onChange={(content) => setFormData({...formData, content})}
-                    />
+                    {langTab === 'vi' ? (
+                      <div className="h-full flex flex-col">
+                        <div className="flex-1 min-h-0">
+                          <MarkdownEditor 
+                            value={formData.content}
+                            onChange={(content) => setFormData({...formData, content})}
+                          />
+                        </div>
+                        <div className="p-4 border-t border-[#E8E2D2]">
+                          <TranslateButton
+                            viFields={{ title: formData.title, excerpt: formData.excerpt, content: formData.content }}
+                            onTranslated={(data) => {
+                              setFormData(prev => ({
+                                ...prev,
+                                titleEn: data.title || prev.titleEn,
+                                excerptEn: data.excerpt || prev.excerptEn,
+                                contentEn: data.content || prev.contentEn,
+                              }))
+                              setLangTab('en')
+                            }}
+                            disabled={!formData.title}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-5 space-y-5 overflow-y-auto h-full">
+                        <EnField label="Title (English)" value={formData.titleEn} onChange={(e) => setFormData({...formData, titleEn: e.target.value})} viValue={formData.title} />
+                        <EnField label="Excerpt (English)" value={formData.excerptEn} onChange={(e) => setFormData({...formData, excerptEn: e.target.value})} viValue={formData.excerpt} multiline />
+                        <EnField label="Content (English)" value={formData.contentEn} onChange={(e) => setFormData({...formData, contentEn: e.target.value})} viValue={formData.content?.substring(0, 100)} multiline />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

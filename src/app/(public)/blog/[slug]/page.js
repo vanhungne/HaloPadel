@@ -1,160 +1,27 @@
-'use client'
-
-import { useParams, notFound } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
+import { prisma } from '@/lib/prisma'
+import { VENUE_ID } from '@/lib/constants'
 
-// Import Mock Data from our blog list
-const mockBlogs = [
-  {
-    id: 'padel-la-gi',
-    title: 'Padel là gì? Tổng quan về môn thể thao đang hot nhất 2026',
-    slug: 'padel-la-gi',
-    excerpt: 'Padel là môn thể thao kết hợp giữa tennis và squash, đang phát triển mạnh mẽ trên toàn thế giới và đặc biệt bùng nổ tại Việt Nam trong năm 2026. Bài viết này sẽ giúp bạn hiểu rõ luật chơi cơ bản, điểm hấp dẫn và vì sao bạn nên bắt đầu chơi Padel ngay hôm nay.',
-    content: `
-      <h2>1. Padel là môn thể thao gì?</h2>
-      <p>Padel là một môn thể thao dùng vợt, thường được mô tả là sự kết hợp hoàn hảo giữa Tennis và Squash. Sân Padel có kích thước bằng khoảng 1/3 sân tennis, được bao quanh bởi các bức tường kính hoặc lưới thép. Giống như Squash, bạn có thể đánh bóng bật tường.</p>
-      <h2>2. Tại sao Padel lại "gây sốt"?</h2>
-      <p>Điểm hấp dẫn nhất của Padel là sự thân thiện với người mới. Nếu như Tennis đòi hỏi nhiều tháng để tập kỹ thuật cơ bản, thì với Padel, bạn có thể bắt nhịp và chơi một trận đấu thú vị chỉ sau 1-2 buổi tập. Môn này cũng thiên về chiến thuật và sự khéo léo thay vì thuần sức mạnh.</p>
-      <h2>3. Dụng cụ chơi Padel</h2>
-      <p>Vợt Padel không có lưới cước như tennis mà là một mặt phẳng liền khối làm từ vật liệu carbon hoặc sợi thủy tinh, có đục các lỗ nhỏ để giảm sức cản không khí. Bóng Padel thoạt nhìn giống bóng tennis nhưng có áp suất thấp hơn một chút.</p>
-      <blockquote>"Padel không chỉ là môn thể thao, nó là một lối sống. Sự gắn kết xã hội sau mỗi trận đấu mới là thứ khiến người ta say mê."</blockquote>
-    `,
-    category: 'KIẾN THỨC PADEL',
-    author: 'HaloPadel Team',
-    readTime: '5 phút đọc',
-    thumbnail: '/images/gallery/gallery_action.png',
-    createdAt: new Date('2026-06-12T10:00:00Z'),
-    isFeatured: true
-  },
-  {
-    id: '5-loi-ich-suc-khoe',
-    title: '5 lợi ích sức khỏe tuyệt vời khi chơi Padel thường xuyên',
-    slug: '5-loi-ich-suc-khoe-choi-padel',
-    excerpt: 'Chơi Padel không chỉ vui mà còn mang lại nhiều lợi ích sức khỏe đáng kinh ngạc cho hệ tim mạch, xương khớp và tinh thần của bạn.',
-    content: `
-      <h2>1. Cải thiện sức khỏe tim mạch</h2>
-      <p>Một trận Padel kéo dài 90 phút sẽ khiến bạn di chuyển liên tục, giúp nhịp tim được duy trì ở mức đốt mỡ và tăng cường sức bền một cách tự nhiên.</p>
-      <h2>2. Giảm căng thẳng hiệu quả</h2>
-      <p>Tính xã hội cao của Padel (luôn chơi đánh đôi) giúp bạn kết nối với bạn bè, giải phóng endorphin và xua tan mọi áp lực công việc.</p>
-      <h2>3. Tăng cường phản xạ</h2>
-      <p>Không gian sân nhỏ và bóng bật tường đòi hỏi người chơi phải phản xạ cực nhanh. Qua thời gian, sự nhạy bén của bạn sẽ tăng lên đáng kể.</p>
-    `,
-    category: 'SỨC KHỎE & THỂ THAO',
-    author: 'HaloPadel Team',
-    readTime: '4 phút đọc',
-    thumbnail: '/images/gallery/gallery_match.png',
-    createdAt: new Date('2026-06-11T14:30:00Z'),
-    isFeatured: false
-  },
-  {
-    id: 'luat-choi-co-ban',
-    title: 'Luật chơi Padel cơ bản dành cho người mới bắt đầu',
-    slug: 'luat-choi-padel-co-ban',
-    excerpt: 'Hướng dẫn chi tiết từ cách tính điểm, cách giao bóng đến các quy định về tường kính trong môn Padel.',
-    content: `
-      <h2>Cách tính điểm</h2>
-      <p>Padel có hệ thống tính điểm hoàn toàn giống Tennis: 15, 30, 40 và Game. Nếu hòa 40-40 sẽ đánh điểm lợi thế (Ad) hoặc điểm vàng (Golden Point) tùy quy định của giải.</p>
-      <h2>Giao bóng (Serve)</h2>
-      <p>Khác biệt lớn nhất: Giao bóng trong Padel luôn được thực hiện ở vị trí <strong>thấp hơn thắt lưng</strong> và bóng phải nảy trên mặt đất trước khi vợt chạm vào bóng. Bạn có 2 cơ hội giao bóng mỗi điểm.</p>
-      <h2>Luật bật tường</h2>
-      <p>Trong quá trình đánh bóng qua lại, bóng phải nảy trên sân trước khi chạm vào tường hoặc kính. Bạn cũng có thể chủ động đánh bóng vào tường sân mình để bóng dội ngược sang sân đối phương (Boast).</p>
-    `,
-    category: 'KIẾN THỨC PADEL',
-    author: 'HaloPadel Team',
-    readTime: '6 phút đọc',
-    thumbnail: '/images/gallery/gallery_serve.png',
-    createdAt: new Date('2026-06-10T09:15:00Z'),
-    isFeatured: false
-  },
-  {
-    id: 'nguoi-moi-can-chuan-bi-gi',
-    title: 'Người mới chơi Padel cần chuẩn bị những dụng cụ gì?',
-    slug: 'nguoi-moi-choi-padel-can-chuan-bi-gi',
-    excerpt: 'Từ vợt, giày đến trang phục, đây là danh sách những món đồ "must-have" trước khi bạn ra sân Padel lần đầu tiên.',
-    content: `
-      <h2>1. Vợt Padel</h2>
-      <p>Người mới nên chọn vợt hình tròn (Round shape) vì vùng điểm ngọt (Sweet spot) rộng lớn, giúp bạn dễ dàng kiểm soát bóng hơn.</p>
-      <h2>2. Giày chơi Padel</h2>
-      <p>Giày là vật dụng quan trọng nhất. Nên chọn loại giày có đế gai hình xương cá (Herringbone) hoặc đế dạng chấm bi (Omni) để bám sân tốt, tránh trơn trượt do cát rải trên mặt cỏ.</p>
-      <h2>3. Trang phục</h2>
-      <p>Trang phục thể thao thoải mái, thấm hút mồ hôi. Một chiếc mũ lưỡi trai và kem chống nắng là không thể thiếu nếu bạn chơi sân ngoài trời ban ngày.</p>
-    `,
-    category: 'KIẾN THỨC PADEL',
-    author: 'HaloPadel Team',
-    readTime: '3 phút đọc',
-    thumbnail: '/images/gallery/gallery_racket.png',
-    createdAt: new Date('2026-06-08T16:45:00Z'),
-    isFeatured: false
-  },
-  {
-    id: 'choi-padel-o-da-nang',
-    title: 'Chơi Padel ở Đà Nẵng: Địa điểm, chi phí và kinh nghiệm',
-    slug: 'choi-padel-o-da-nang',
-    excerpt: 'Review chi tiết về phong trào Padel tại Đà Nẵng, các sân chơi nổi bật, chi phí thuê sân và cách đặt lịch dễ dàng nhất.',
-    content: `
-      <h2>Sự bùng nổ của Padel tại Đà Nẵng</h2>
-      <p>Năm 2026, Đà Nẵng chứng kiến sự xuất hiện của hàng loạt sân Padel đạt tiêu chuẩn quốc tế. Cảnh quan thành phố biển cộng hưởng với tính chất sôi động của Padel đã tạo nên một cộng đồng người chơi khổng lồ.</p>
-      <h2>Đến HaloPadel Sports Club</h2>
-      <p>Là một trong những cụm sân tiên phong và đẳng cấp nhất, HaloPadel cung cấp cơ sở vật chất 5 sao với mặt cỏ nhập khẩu, đèn LED chống chói và khu Lounge cafe thư giãn cực chill.</p>
-    `,
-    category: 'TIN TỨC SÂN',
-    author: 'HaloPadel Team',
-    readTime: '7 phút đọc',
-    thumbnail: '/images/gallery/gallery_sunset.png',
-    createdAt: new Date('2026-06-05T11:20:00Z'),
-    isFeatured: false
-  },
-  {
-    id: 'kinh-nghiem-chon-khung-gio',
-    title: 'Kinh nghiệm chọn khung giờ chơi Padel phù hợp nhất',
-    slug: 'kinh-nghiem-chon-khung-gio-choi-padel',
-    excerpt: 'Nên chơi buổi sáng sớm, chiều tà hay tối muộn? Phân tích ưu nhược điểm của từng khung giờ tập luyện.',
-    content: `
-      <h2>1. Sáng sớm (6:00 - 8:00)</h2>
-      <p>Khung giờ vàng cho dân văn phòng khởi động ngày mới. Thời tiết mát mẻ, ít gió và tĩnh lặng.</p>
-      <h2>2. Chiều tà (16:00 - 18:00)</h2>
-      <p>Đông vui, nhộn nhịp nhất nhưng thường phải đặt sân trước rất sớm. Trải nghiệm đánh dưới ánh hoàng hôn cực kỳ lãng mạn.</p>
-      <h2>3. Tối muộn (20:00 - 22:00)</h2>
-      <p>Thời điểm để xả stress sau một ngày dài. Các sân dưới hệ thống đèn LED sẽ mang lại cảm giác cực kỳ chuyên nghiệp và tập trung.</p>
-    `,
-    category: 'SỨC KHỎE & THỂ THAO',
-    author: 'HaloPadel Team',
-    readTime: '4 phút đọc',
-    thumbnail: '/images/gallery/gallery_night.png',
-    createdAt: new Date('2026-06-03T08:00:00Z'),
-    isFeatured: false
-  },
-  {
-    id: 'cac-loi-thuong-gap',
-    title: '5 lỗi kỹ thuật thường gặp khi mới chuyển từ Tennis sang Padel',
-    slug: 'cac-loi-thuong-gap-khi-choi-padel',
-    excerpt: 'Rất nhiều người chơi Tennis chuyển sang Padel mắc phải những sai lầm này. Hãy đọc để biết cách khắc phục ngay.',
-    content: `
-      <h2>1. Đánh quá mạnh</h2>
-      <p>Trong Padel, đánh mạnh không bằng đánh hiểm. Việc đập bóng quá sức thường khiến bóng dội tường bật ngược lại cao và tạo cơ hội để đối phương ghi điểm.</p>
-      <h2>2. Cầm vợt quá lỏng</h2>
-      <p>Vợt Padel nặng hơn một chút so với vợt tennis và không có cước nên độ rung lớn. Cần cầm chắc cán vợt (Continental grip).</p>
-      <h2>3. Quên không sử dụng tường</h2>
-      <p>Nhiều tay vợt tennis cố gắng chạy lùi thật nhanh để đỡ bóng thay vì đợi bóng chạm tường nảy ra phía trước. Hãy làm bạn với bức tường kính!</p>
-    `,
-    category: 'KIẾN THỨC PADEL',
-    author: 'HaloPadel Team',
-    readTime: '5 phút đọc',
-    thumbnail: '/images/gallery/gallery_action.png',
-    createdAt: new Date('2026-06-01T15:10:00Z'),
-    isFeatured: false
-  }
-]
+export default async function BlogDetailPage({ params }) {
+  const { slug } = await params
 
-export default function BlogDetailPage() {
-  const params = useParams()
-  const slug = params?.slug
+  if (!slug) notFound()
 
-  const post = mockBlogs.find(b => b.slug === slug)
+  const post = await prisma.blogPost.findUnique({
+    where: { 
+      venueId_slug: { venueId: VENUE_ID, slug }
+    },
+    include: {
+      author: true,
+      category: true
+    }
+  })
 
-  if (!post) {
+
+  if (!post || post.status !== 'PUBLISHED' || post.isDeleted) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center bg-[#FFFDF6]">
         <h1 className="text-4xl font-bold text-[#111111] mb-4">404 - Không tìm thấy</h1>
@@ -166,8 +33,17 @@ export default function BlogDetailPage() {
     )
   }
 
-  // Related posts (excluding current)
-  const relatedPosts = mockBlogs.filter(b => b.slug !== slug).slice(0, 3)
+  const relatedPosts = await prisma.blogPost.findMany({
+    where: { 
+      venueId: VENUE_ID, 
+      status: 'PUBLISHED', 
+      isDeleted: false,
+      id: { not: post.id }
+    },
+    include: { category: true },
+    orderBy: { createdAt: 'desc' },
+    take: 3
+  })
 
   return (
     <div className="py-12 md:py-24 bg-[#FFFDF6] min-h-screen">
@@ -177,7 +53,7 @@ export default function BlogDetailPage() {
         <div className="flex items-center gap-2 text-[13px] font-semibold mb-8 text-[#888888]">
           <Link href="/blog" className="hover:text-[#D45A2A] transition-colors">Blog</Link>
           <span>/</span>
-          <span className="text-[#D45A2A] uppercase tracking-wider">{post.category}</span>
+          <span className="text-[#D45A2A] uppercase tracking-wider">{post.category?.name || 'TIN TỨC'}</span>
         </div>
 
         {/* Header */}
@@ -192,11 +68,11 @@ export default function BlogDetailPage() {
                 H
               </div>
               <div>
-                <p className="text-[#111111] font-bold text-[15px]">{post.author}</p>
+                <p className="text-[#111111] font-bold text-[15px]">{post.author?.fullName || 'HaloPadel Team'}</p>
                 <div className="flex items-center gap-3 text-[13px] text-[#888888] font-medium mt-0.5">
-                  <span>{formatDate(post.createdAt)}</span>
+                  <span>{formatDate(post.publishedAt || post.createdAt)}</span>
                   <span className="w-1 h-1 rounded-full bg-[#E8E2D2]" />
-                  <span>{post.readTime}</span>
+                  <span>{Math.ceil((post.content?.length || 1000) / 1000)} phút đọc</span>
                 </div>
               </div>
             </div>
@@ -216,7 +92,7 @@ export default function BlogDetailPage() {
         {/* Cover Image */}
         <div className="relative w-full h-[300px] md:h-[450px] lg:h-[550px] rounded-[32px] overflow-hidden shadow-sm border border-[#E8E2D2] mb-12">
           <Image 
-            src={post.thumbnail} 
+            src={post.coverImage || '/images/gallery/gallery_action.png'} 
             alt={post.title} 
             fill 
             className="object-cover"
@@ -255,13 +131,13 @@ export default function BlogDetailPage() {
               >
                 <div className="relative w-full h-[220px] overflow-hidden">
                   <Image 
-                    src={blog.thumbnail} 
+                    src={blog.coverImage || '/images/gallery/gallery_action.png'} 
                     alt={blog.title} 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-[#111111] px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm">
-                    {blog.category}
+                    {blog.category?.name || 'TIN TỨC'}
                   </div>
                 </div>
                 
@@ -275,7 +151,7 @@ export default function BlogDetailPage() {
                   
                   <div className="mt-auto flex items-center justify-between border-t border-[#E8E2D2] pt-5">
                     <span className="text-[#888888] text-[12px] font-medium">
-                      {formatDate(blog.createdAt)}
+                      {formatDate(blog.publishedAt || blog.createdAt)}
                     </span>
                     <span className="text-[#D45A2A] font-bold text-[13px] flex items-center gap-1 group-hover:gap-2 transition-all">
                       Đọc tiếp <span aria-hidden="true">&rarr;</span>

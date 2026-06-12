@@ -85,11 +85,11 @@ export default function ImageUpload({ value, onChange, folder = 'halopadel', lab
         <div className="flex gap-2 items-center text-[12px] text-[#888888]">
           <span>Hoặc dán link:</span>
           <input 
-            type="url"
+            type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className="flex-1 px-3 py-1.5 bg-white border border-[#E8E2D2] focus:border-[#D45A2A] rounded outline-none transition-all"
-            placeholder="https://..."
+            placeholder="/images/... hoặc https://..."
           />
         </div>
       </div>
