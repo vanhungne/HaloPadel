@@ -53,14 +53,14 @@ export default function AnnouncementsSection({ section }) {
   ]
 
   return (
-    <section id="announcements" className="py-24 bg-[#FFFDF6]" ref={sectionRef}>
+    <section id="announcements" className="py-14 md:py-24 bg-[#FFFDF6]" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             Thông báo mới nhất
           </p>
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
             {section?.title || 'Bảng tin HaloPadel'}
           </h2>
           <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -73,7 +73,7 @@ export default function AnnouncementsSection({ section }) {
           
           {/* Left: Featured Announcement */}
           <div 
-            className="flex flex-col p-8 md:p-10 transition-transform duration-500 hover:-translate-y-1"
+            className="flex flex-col p-6 sm:p-8 md:p-10 transition-transform duration-500 hover:-translate-y-1"
             style={{
               background: 'linear-gradient(135deg, #FFF9EE 0%, #FBEAD8 100%)',
               border: '1px solid rgba(212, 90, 42, 0.18)',

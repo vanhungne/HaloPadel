@@ -120,7 +120,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div style={{ marginTop: '-76px' }}>
+    <div style={{ marginTop: '-72px' }}>
       {sectionOrder.map((key) => sectionComponents[key] || null)}
     </div>
   )

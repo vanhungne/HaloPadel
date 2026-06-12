@@ -29,7 +29,7 @@ export default function Header({ venue }) {
       <div className="section-container">
         <div 
           className="flex items-center justify-between transition-all duration-300" 
-          style={{ height: isScrolled ? '68px' : '88px' }}
+          style={{ height: isScrolled ? '60px' : '72px' }}
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3.5 shrink-0 group">
@@ -37,7 +37,7 @@ export default function Header({ venue }) {
               src={venue?.logo || '/images/logo.png'}
               alt={venue?.name || 'HaloPadel'}
               className={`rounded-full object-cover border-[1.5px] border-[#E8E2D2] group-hover:border-[#D45A2A] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_4px_12px_rgba(212,90,42,0.15)] ${
-                isScrolled ? 'h-[44px] w-[44px]' : 'h-[52px] w-[52px]'
+                isScrolled ? 'h-[38px] w-[38px] md:h-[44px] md:w-[44px]' : 'h-[44px] w-[44px] md:h-[52px] md:w-[52px]'
               }`}
             />
             <div className="hidden sm:flex flex-col leading-none">

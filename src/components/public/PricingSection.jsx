@@ -28,14 +28,14 @@ export default function PricingSection({ plans, section }) {
   ]
 
   return (
-    <section id="pricing" className="py-20 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
+    <section id="pricing" className="py-14 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1240px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             Bảng giá sân padel
           </p>
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
             Linh hoạt theo khung giờ, ưu đãi tốt cho hội nhóm và khách chơi thường xuyên
           </h2>
         </div>
@@ -89,7 +89,7 @@ export default function PricingSection({ plans, section }) {
           {/* Right: Membership Card (5/12) */}
           <div className="lg:col-span-5">
             <div 
-              className="relative p-8 md:p-10 text-center transition-transform hover:-translate-y-2 duration-500"
+              className="relative p-6 sm:p-8 md:p-10 text-center transition-transform hover:-translate-y-2 duration-500"
               style={{
                 background: 'linear-gradient(180deg, #FFF9EE 0%, #FBEAD8 100%)',
                 border: '1px solid rgba(212, 90, 42, 0.22)',
@@ -109,12 +109,12 @@ export default function PricingSection({ plans, section }) {
                 Dành cho người chơi thường xuyên hoặc nhóm bạn cố định
               </p>
               
-              <div className="mb-6 flex justify-center items-end gap-1">
-                <span className="text-4xl md:text-5xl font-bold text-[#D45A2A]">3.500.000đ</span>
+              <div className="mb-5 sm:mb-6 flex justify-center items-end gap-1">
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#D45A2A]">3.500.000đ</span>
                 <span className="text-[#888888] font-medium text-lg mb-1">/tháng</span>
               </div>
 
-              <ul className="text-left space-y-4 mb-8 max-w-[260px] mx-auto">
+              <ul className="text-left space-y-3 sm:space-y-4 mb-6 sm:mb-8 max-w-[260px] mx-auto">
                 <li className="flex items-center gap-3 text-[#111111] font-medium">
                   <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -139,7 +139,7 @@ export default function PricingSection({ plans, section }) {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center mt-16 max-w-2xl mx-auto">
+        <div className="text-center mt-10 md:mt-16 max-w-2xl mx-auto">
           <p className="text-[15px] font-medium text-[#111111] mb-6">
             Chưa biết chọn khung giờ nào? Đội ngũ HaloPadel sẽ tư vấn lịch chơi phù hợp cho bạn.
           </p>

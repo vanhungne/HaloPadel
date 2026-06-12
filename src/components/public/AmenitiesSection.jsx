@@ -61,14 +61,14 @@ export default function AmenitiesSection({ section }) {
   }, [])
 
   return (
-    <section id="amenities" className="py-20 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
+    <section id="amenities" className="py-14 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1500px] mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             Tiện ích sân
           </p>
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-3 md:mb-4">
             {section?.title || 'Dịch vụ & Tiện ích'}
           </h2>
           <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -76,10 +76,10 @@ export default function AmenitiesSection({ section }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8">
           {/* Left Hero Image */}
           <div 
-            className={`lg:col-span-5 relative rounded-2xl overflow-hidden min-h-[400px] lg:min-h-full transition-all duration-1000 ease-out shadow-lg ${
+            className={`lg:col-span-5 relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[400px] lg:min-h-full transition-all duration-1000 ease-out shadow-lg ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
             }`}
           >
@@ -103,7 +103,7 @@ export default function AmenitiesSection({ section }) {
           </div>
 
           {/* Right Cards Grid */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
             {PHOTO_AMENITIES.map((item, index) => (
               <div 
                 key={item.id}
@@ -113,7 +113,7 @@ export default function AmenitiesSection({ section }) {
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
                 {/* Image Half */}
-                <div className="relative h-[220px] overflow-hidden">
+                <div className="relative h-[180px] sm:h-[220px] overflow-hidden">
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -126,7 +126,7 @@ export default function AmenitiesSection({ section }) {
                 </div>
                 
                 {/* Content Half */}
-                <div className="p-7">
+                <div className="p-5 sm:p-7">
                   <h4 className="text-[18px] font-bold text-[#111111] mb-2 group-hover:text-[#D45A2A] transition-colors">
                     {item.name}
                   </h4>

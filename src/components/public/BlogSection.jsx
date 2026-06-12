@@ -64,15 +64,15 @@ export default function BlogSection({ section }) {
   ]
 
   return (
-    <section id="blog" className="py-24 bg-white" ref={sectionRef}>
+    <section id="blog" className="py-14 md:py-24 bg-white" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1300px] mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mb-10 md:mb-16">
           <div className="max-w-2xl">
             <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
               Kiến thức Padel
             </p>
-            <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-3 md:mb-4">
               {section?.title || 'Blog Padel'}
             </h2>
             <p className="text-[#555555] text-base md:text-lg leading-relaxed">
@@ -99,7 +99,7 @@ export default function BlogSection({ section }) {
               href={`/blog/${FEATURED_POST.slug}`}
               className="group block h-full rounded-3xl overflow-hidden bg-[#FFFDF6] border border-[#E8E2D2] hover:border-[#D45A2A]/30 transition-all duration-500 hover:shadow-[0_24px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1"
             >
-              <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+              <div className="relative h-[220px] sm:h-[300px] md:h-[400px] w-full overflow-hidden">
                 <Image
                   src={FEATURED_POST.image}
                   alt={FEATURED_POST.title}
@@ -112,7 +112,7 @@ export default function BlogSection({ section }) {
                 </div>
               </div>
               
-              <div className="p-6 md:p-8">
+              <div className="p-5 sm:p-6 md:p-8">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-[#888888] font-medium mb-4">
                   <span className="flex items-center gap-1.5 text-[#111111]">
                     <svg className="w-4 h-4 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

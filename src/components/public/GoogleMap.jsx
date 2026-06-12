@@ -5,14 +5,14 @@ import Image from 'next/image'
 
 export default function GoogleMap({ venue, section }) {
   return (
-    <section id="map" className="py-16 md:py-24 bg-white">
+    <section id="map" className="py-12 md:py-24 bg-white">
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-8 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             Vị trí HaloPadel
           </p>
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-3 md:mb-4">
             {section?.title || 'Bản đồ'}
           </h2>
           <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -20,9 +20,9 @@ export default function GoogleMap({ venue, section }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-10">
           {/* Map (8/12) */}
-          <div className="lg:col-span-8 relative rounded-[28px] overflow-hidden border border-[#D45A2A]/20 h-[360px] lg:h-[500px] shadow-[0_24px_70px_rgba(212,90,42,0.12)]">
+          <div className="lg:col-span-8 relative rounded-[20px] sm:rounded-[28px] overflow-hidden border border-[#D45A2A]/20 h-[280px] sm:h-[360px] lg:h-[500px] shadow-[0_24px_70px_rgba(212,90,42,0.12)]">
             {/* Map Iframe */}
             {venue?.googleMapsEmbed ? (
               <div
@@ -64,9 +64,9 @@ export default function GoogleMap({ venue, section }) {
           </div>
 
           {/* Info Card (4/12) */}
-          <div className="lg:col-span-4 bg-[#FFFDF6] rounded-[28px] p-6 md:p-8 border border-[#E8E2D2] shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300">
+          <div className="lg:col-span-4 bg-[#FFFDF6] rounded-[20px] sm:rounded-[28px] p-5 sm:p-6 md:p-8 border border-[#E8E2D2] shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300">
             {/* Thumbnail Header */}
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-[#D45A2A]/20">
                 <Image src="/images/amenities/lounge.png" alt="HaloPadel" fill className="object-cover" />
               </div>
@@ -80,7 +80,7 @@ export default function GoogleMap({ venue, section }) {
               Thông tin liên hệ
             </h3>
             
-            <div className="space-y-6 flex-1">
+            <div className="space-y-4 sm:space-y-6 flex-1">
               {[
                 { icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z', icon2: 'M15 11a3 3 0 11-6 0 3 3 0 016 0z', label: 'Địa chỉ', value: venue?.address || 'Đường Nguyễn Tri Phương, Phường Hoà Xuân, Quận Cẩm Lệ, TP. Đà Nẵng', href: venue?.googleMapsUrl, target: '_blank' },
                 { icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label: 'Hotline', value: venue?.hotline || '0909 123 456', href: venue?.hotline ? `tel:${venue.hotline}` : 'tel:0909123456' },
@@ -111,7 +111,7 @@ export default function GoogleMap({ venue, section }) {
             </div>
 
             {/* Dual CTAs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 mt-8 pt-8 border-t border-[#E8E2D2]">
+            <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-[#E8E2D2]">
               <a
                 href={venue?.googleMapsUrl || '#'}
                 target="_blank"

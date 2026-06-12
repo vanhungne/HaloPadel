@@ -82,7 +82,7 @@ export default function FloatingCTA({ venue }) {
           boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
         }}
       >
-        <div className="flex items-center justify-around py-2 px-3 gap-2">
+        <div className="flex items-center justify-around py-2.5 px-3 gap-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
           {items.map((item, i) => (
             <a
               key={i}
@@ -103,8 +103,7 @@ export default function FloatingCTA({ venue }) {
           ))}
         </div>
 
-        {/* Safe area for iOS bottom notch */}
-        <div className="h-[env(safe-area-inset-bottom)]" />
+        {/* Safe area spacer for iOS bottom notch - use padding instead */}
       </div>
     </>
   )

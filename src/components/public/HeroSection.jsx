@@ -5,7 +5,7 @@ export default function HeroSection({ venue, heroImage }) {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden flex items-center min-h-[100vh]"
+      className="relative w-full overflow-hidden flex items-center min-h-[100svh]"
     >
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
@@ -23,9 +23,15 @@ export default function HeroSection({ venue, heroImage }) {
         )}
 
         {/* Overlay Gradients */}
-        {/* Horizontal gradient: Darker on the left for text readability, fully transparent on the right */}
+        {/* Mobile: vertical gradient for full readability. Desktop: horizontal gradient darker on left */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 md:hidden"
+          style={{
+            background: 'linear-gradient(180deg, rgba(18, 12, 8, 0.3) 0%, rgba(18, 12, 8, 0.6) 40%, rgba(18, 12, 8, 0.85) 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 hidden md:block"
           style={{
             background: 'linear-gradient(90deg, rgba(18, 12, 8, 0.85) 0%, rgba(18, 12, 8, 0.5) 45%, rgba(18, 12, 8, 0) 70%)',
           }}
@@ -33,12 +39,12 @@ export default function HeroSection({ venue, heroImage }) {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full -mt-[8vh] md:-mt-[12vh]" style={{ paddingTop: '76px' }}>
-        <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12">
+      <div className="relative z-10 w-full -mt-[4vh] md:-mt-[12vh]" style={{ paddingTop: '72px' }}>
+        <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-6 lg:px-12">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-10">
             
             {/* Left Content Area */}
-            <div className="w-full lg:w-[65%] max-w-[720px] pt-8 lg:pt-0">
+            <div className="w-full lg:w-[65%] max-w-[720px] pt-4 sm:pt-8 lg:pt-0">
               
               {/* Top row: Brand & Badge */}
               <div className="flex items-center gap-4 mb-[28px]">
@@ -91,17 +97,17 @@ export default function HeroSection({ venue, heroImage }) {
               </p>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pb-6 sm:pb-0">
                 {/* Primary CTA */}
                 {venue?.hotline && (
                   <a
                     href={`tel:${venue.hotline}`}
                     className="inline-flex items-center justify-center gap-2.5 text-white font-bold transition-all duration-200 hover:-translate-y-0.5"
                     style={{
-                      height: '56px',
-                      padding: '0 32px',
-                      borderRadius: '16px',
-                      fontSize: '16px',
+                      height: '52px',
+                      padding: '0 24px',
+                      borderRadius: '14px',
+                      fontSize: '15px',
                       background: '#D45A2A',
                       boxShadow: '0 8px 24px rgba(212, 90, 42, 0.35)',
                     }}
@@ -121,10 +127,10 @@ export default function HeroSection({ venue, heroImage }) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2.5 text-white font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                     style={{
-                      height: '56px',
-                      padding: '0 28px',
-                      borderRadius: '16px',
-                      fontSize: '15px',
+                      height: '48px',
+                      padding: '0 22px',
+                      borderRadius: '14px',
+                      fontSize: '14px',
                       background: 'rgba(255,255,255,0.12)',
                       backdropFilter: 'blur(16px)',
                       WebkitBackdropFilter: 'blur(16px)',
@@ -143,10 +149,10 @@ export default function HeroSection({ venue, heroImage }) {
                   href="/hinh-anh"
                   className="inline-flex items-center justify-center gap-2.5 text-white font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                   style={{
-                    height: '56px',
-                    padding: '0 28px',
-                    borderRadius: '16px',
-                    fontSize: '15px',
+                    height: '48px',
+                    padding: '0 22px',
+                    borderRadius: '14px',
+                    fontSize: '14px',
                     background: 'rgba(255,255,255,0.12)',
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',

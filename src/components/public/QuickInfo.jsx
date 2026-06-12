@@ -52,13 +52,13 @@ export default function QuickInfo({ venue }) {
   ].filter((item) => item.value)
 
   return (
-    <section id="quickinfo" className="relative z-20 -mt-[8rem] md:-mt-[12rem]">
+    <section id="quickinfo" className="relative z-20 -mt-[4rem] sm:-mt-[6rem] md:-mt-[12rem]">
       <div className="section-container">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {items.map((item, index) => (
             <div
               key={index}
-              className="bg-[#FFF9EE] rounded-[22px] p-6 group transition-all duration-300 hover:-translate-y-1"
+              className="bg-[#FFF9EE] rounded-[18px] sm:rounded-[22px] p-4 sm:p-6 group transition-all duration-300 hover:-translate-y-1"
               style={{
                 border: '1px solid rgba(58, 36, 24, 0.08)',
                 boxShadow: '0 8px 30px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02)',

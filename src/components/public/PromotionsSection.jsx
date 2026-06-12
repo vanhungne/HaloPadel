@@ -23,14 +23,14 @@ export default function PromotionsSection({ section }) {
   }, [])
 
   return (
-    <section id="promotions" className="py-20 md:py-28 bg-white" ref={sectionRef}>
+    <section id="promotions" className="py-14 md:py-28 bg-white" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1400px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             Khuyến mãi sân padel
           </p>
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
             {section?.title || 'Ưu đãi tại HaloPadel'}
           </h2>
           <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -46,7 +46,7 @@ export default function PromotionsSection({ section }) {
             <div className="group relative bg-[#FFFDF6] rounded-2xl overflow-hidden border border-[#E8E2D2] hover:border-[#D45A2A]/40 transition-all duration-700 hover:shadow-[0_24px_50px_rgba(212,90,42,0.15)] hover:-translate-y-1 h-full flex flex-col">
               
               {/* Image Area */}
-              <div className="relative h-[250px] md:h-[350px] lg:h-[400px] overflow-hidden">
+              <div className="relative h-[200px] sm:h-[250px] md:h-[350px] lg:h-[400px] overflow-hidden">
                 <Image
                   src="/images/gallery/gallery_action.png"
                   alt="Khai trương giảm 30%"
@@ -66,7 +66,7 @@ export default function PromotionsSection({ section }) {
               </div>
 
               {/* Content Area */}
-              <div className="p-6 md:p-8 flex-1 flex flex-col justify-between bg-white relative z-10">
+              <div className="p-5 sm:p-6 md:p-8 flex-1 flex flex-col justify-between bg-white relative z-10">
                 <div>
                   <h3 className="font-heading text-2xl md:text-[28px] font-bold text-[#111111] group-hover:text-[#D45A2A] transition-colors mb-4 leading-tight">
                     Nhận ưu đãi thuê sân tất cả khung giờ trong tháng khai trương.

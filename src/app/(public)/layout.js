@@ -16,8 +16,8 @@ export default async function PublicLayout({ children }) {
   return (
     <>
       <Header venue={venue} />
-      <main className="flex-1" style={{ paddingTop: '76px' }}>
-        <div className="md:pb-0 pb-16">
+      <main className="flex-1" style={{ paddingTop: '72px' }}>
+        <div className="md:pb-0 pb-[72px]">
           {children}
         </div>
       </main>

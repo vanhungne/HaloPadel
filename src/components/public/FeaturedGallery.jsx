@@ -55,11 +55,11 @@ export default function FeaturedGallery({ section }) {
   }, [])
 
   return (
-    <section id="gallery" className="py-20 md:py-28 bg-[#FFFDF6]">
+    <section id="gallery" className="py-14 md:py-28 bg-[#FFFDF6]">
       <div className="w-full px-4 md:px-8 max-w-[1500px] mx-auto">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight uppercase tracking-widest">
+          <h2 className="font-heading text-2xl sm:text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight uppercase tracking-widest">
             Không Gian
           </h2>
         </div>
@@ -67,7 +67,7 @@ export default function FeaturedGallery({ section }) {
         {/* Premium Collage Grid */}
         <div 
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-4 md:auto-rows-[380px] gap-3 md:gap-4 mx-auto"
+          className="grid grid-cols-1 md:grid-cols-4 md:auto-rows-[380px] gap-2.5 md:gap-4 mx-auto"
         >
           {GALLERY_IMAGES.map((img, index) => (
             <div 
