@@ -1,6 +1,8 @@
 import { getAiSettings, getApiKeys, getAiUsageLogs } from '@/actions/admin/aiSettings'
 import AiSettingsClient from './AiSettingsClient'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'AI Settings | HaloPadel Admin',
   description: 'Quản lý cấu hình AI, API Keys và lịch sử sử dụng Groq'

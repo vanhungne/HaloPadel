@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { getDashboardStats } from '@/actions/dashboard'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminDashboard() {
   const data = await getDashboardStats()
 
