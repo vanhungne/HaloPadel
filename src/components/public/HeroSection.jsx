@@ -102,7 +102,7 @@ export default function HeroSection({ venue, heroImage }) {
                 {venue?.hotline && (
                   <a
                     href={`tel:${venue.hotline}`}
-                    className="inline-flex items-center justify-center gap-2.5 text-white font-bold transition-all duration-200 hover:-translate-y-0.5"
+                    className="hidden sm:inline-flex items-center justify-center gap-2.5 text-white font-bold transition-all duration-200 hover:-translate-y-0.5"
                     style={{
                       height: '52px',
                       padding: '0 24px',
@@ -125,7 +125,7 @@ export default function HeroSection({ venue, heroImage }) {
                     href={`https://zalo.me/${venue.zalo}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2.5 text-white font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
+                    className="hidden sm:inline-flex items-center justify-center gap-2.5 text-white font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20"
                     style={{
                       height: '48px',
                       padding: '0 22px',
