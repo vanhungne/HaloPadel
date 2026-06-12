@@ -40,7 +40,7 @@ export default function Header({ venue }) {
                 isScrolled ? 'h-[38px] w-[38px] md:h-[44px] md:w-[44px]' : 'h-[44px] w-[44px] md:h-[52px] md:w-[52px]'
               }`}
             />
-            <div className="hidden sm:flex flex-col leading-none">
+            <div className="flex flex-col leading-none">
               <span className="font-heading font-extrabold text-[20px] text-[#111111] tracking-tight transition-colors group-hover:text-[#D45A2A]">
                 Halo<span className="text-[#D45A2A]">Padel</span>
               </span>
