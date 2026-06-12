@@ -28,7 +28,7 @@ export default function Footer({ venue }) {
               </div>
             </div>
             <p className="text-white/40 text-[13px] leading-relaxed mb-5">
-              {venue?.shortDesc || 'Sân thể thao chuyên nghiệp, không gian tập luyện đẳng cấp với tiện nghi hiện đại.'}
+              {venue?.shortDesc || 'Sân Padel chuyên nghiệp tại Đà Nẵng - Không gian tập luyện đẳng cấp với tiện nghi hiện đại.'}
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-2.5">

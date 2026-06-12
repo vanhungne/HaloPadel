@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { VENUE_ID } from '@/lib/constants'
+import GalleryShowcase from '@/components/public/GalleryShowcase'
 import Image from 'next/image'
 
 export const revalidate = 60
@@ -10,7 +11,7 @@ export async function generateMetadata() {
   })
   return {
     title: seo?.metaTitle || 'Hình ảnh',
-    description: seo?.metaDescription || 'Hình ảnh sân thể thao HaloPadel',
+    description: seo?.metaDescription || 'Khám phá không gian tập luyện đẳng cấp tại HaloPadel',
   }
 }
 
@@ -18,7 +19,7 @@ async function getGalleryData() {
   return prisma.mediaFile.findMany({
     where: {
       venueId: VENUE_ID,
-      category: { in: ['GALLERY', 'COURT', 'HERO', 'AMENITY'] },
+      category: { in: ['GALLERY', 'COURT', 'HERO', 'AMENITY', 'LOUNGE'] },
       isActive: true,
       isDeleted: false,
     },
@@ -29,75 +30,42 @@ async function getGalleryData() {
 export default async function GalleryPage() {
   const images = await getGalleryData()
 
-  // Group by category
-  const categories = {}
-  images.forEach((img) => {
-    if (!categories[img.category]) categories[img.category] = []
-    categories[img.category].push(img)
-  })
-
-  const categoryLabels = {
-    HERO: 'Banner',
-    COURT: 'Sân chơi',
-    GALLERY: 'Không gian',
-    AMENITY: 'Tiện ích',
-  }
+  // Find a hero image to feature at the top
+  const heroImage = images.find(img => img.category === 'HERO') || images.find(img => img.category === 'GALLERY') || images[0]
 
   return (
-    <div className="py-8 md:py-12">
-      {/* Page Header */}
-      <div className="section-container mb-12">
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-text-main mb-4">
-            Hình ảnh <span className="text-primary">sân</span>
+    <div className="py-12 md:py-20 bg-[#FFFDF6] min-h-screen">
+      <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
+        
+        {/* Page Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] font-bold text-[#111111] mb-4">
+            Hình ảnh sân
           </h1>
-          <p className="text-lg text-text-sub">
+          <p className="text-[#555555] text-lg">
             Khám phá không gian tập luyện đẳng cấp tại HaloPadel
           </p>
-          <div className="w-20 h-1 bg-primary mx-auto mt-6 rounded-full" />
         </div>
-      </div>
 
-      {/* Gallery */}
-      <div className="section-container">
-        {Object.entries(categories).map(([cat, imgs]) => (
-          <div key={cat} className="mb-12">
-            <h2 className="font-heading text-xl font-bold text-text-main mb-6 flex items-center gap-2">
-              <div className="w-1 h-6 bg-primary rounded-full" />
-              {categoryLabels[cat] || cat}
-              <span className="text-sm font-normal text-text-light ml-2">({imgs.length} ảnh)</span>
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-              {imgs.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative rounded-2xl overflow-hidden group cursor-pointer h-40 md:h-52"
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.altText || img.caption || 'HaloPadel'}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
-                  {img.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <p className="text-white text-xs font-medium">{img.caption}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+        {/* Hero Section */}
+        {heroImage && (
+          <div className="mb-16 md:mb-20">
+            <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-[24px] md:rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+              <Image 
+                src={heroImage.url} 
+                alt={heroImage.altText || 'HaloPadel Premium Space'} 
+                fill 
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
             </div>
           </div>
-        ))}
-
-        {images.length === 0 && (
-          <div className="text-center py-20">
-            <span className="text-6xl mb-4 block">🖼️</span>
-            <p className="text-text-light text-lg">Hình ảnh đang được cập nhật...</p>
-          </div>
         )}
+
+        {/* Interactive Gallery Showcase (Tabs + Grid + Lightbox) */}
+        <GalleryShowcase images={images} />
+        
       </div>
     </div>
   )

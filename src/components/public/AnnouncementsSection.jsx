@@ -1,86 +1,182 @@
+'use client'
+
 import Link from 'next/link'
-import { formatRelativeTime } from '@/lib/utils'
+import { useState, useEffect, useRef } from 'react'
 
-const typeConfig = {
-  INFO: { icon: 'ℹ', bg: 'bg-blue-50', text: 'text-blue-600', label: 'Thông tin' },
-  PROMOTION: { icon: '🎁', bg: 'bg-[#BE4F24]/5', text: 'text-[#BE4F24]', label: 'Ưu đãi' },
-  EVENT: { icon: '🏆', bg: 'bg-amber-50', text: 'text-amber-600', label: 'Sự kiện' },
-  MAINTENANCE: { icon: '🔧', bg: 'bg-gray-100', text: 'text-gray-600', label: 'Bảo trì' },
-  WARNING: { icon: '⚠', bg: 'bg-red-50', text: 'text-red-500', label: 'Cảnh báo' },
-}
+export default function AnnouncementsSection({ section }) {
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef(null)
 
-export default function AnnouncementsSection({ announcements, section }) {
-  if (!announcements || announcements.length === 0) return null
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.1 }
+    )
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  const SMALL_ANNOUNCEMENTS = [
+    {
+      id: 1,
+      type: 'Sự kiện',
+      typeColor: 'text-amber-600 bg-amber-50',
+      title: 'Giải đấu Padel mở rộng tháng 7/2026',
+      time: '2 ngày trước'
+    },
+    {
+      id: 2,
+      type: 'Bảo trì',
+      typeColor: 'text-gray-600 bg-gray-100',
+      title: 'Lịch bảo trì sân tuần này (Cụm sân A)',
+      time: '4 ngày trước'
+    },
+    {
+      id: 3,
+      type: 'Ưu đãi',
+      typeColor: 'text-[#D45A2A] bg-[#D45A2A]/10',
+      title: 'Ưu đãi gói tháng đặc biệt cho hội nhóm',
+      time: '1 tuần trước'
+    },
+    {
+      id: 4,
+      type: 'Thông tin',
+      typeColor: 'text-blue-600 bg-blue-50',
+      title: 'Cập nhật quy định thuê vợt và check-in',
+      time: '2 tuần trước'
+    }
+  ]
 
   return (
-    <section id="announcements" className="py-20 md:py-28 bg-[#FFFDF6]">
-      <div className="section-container">
+    <section id="announcements" className="py-24 bg-[#FFFDF6]" ref={sectionRef}>
+      <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-14">
-          <p className="text-[13px] font-semibold text-[#BE4F24] uppercase tracking-[0.2em] mb-3">
-            Cập nhật
+        <div className="text-center mb-16">
+          <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
+            Thông báo mới nhất
           </p>
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-3">
-            {section?.title || 'Thông báo'}
+          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+            {section?.title || 'Bảng tin HaloPadel'}
           </h2>
-          <p className="text-[#555555] text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-            {section?.subtitle || 'Cập nhật tin tức mới nhất'}
+          <p className="text-[#555555] text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+            {section?.subtitle || 'Cập nhật lịch hoạt động, sự kiện và ưu đãi từ hệ thống sân của chúng tôi.'}
           </p>
         </div>
 
-        {/* Announcements List */}
-        <div className="max-w-2xl mx-auto space-y-3">
-          {announcements.map((ann) => {
-            const config = typeConfig[ann.type] || typeConfig.INFO
-            return (
-              <Link
-                key={ann.id}
-                href={`/thong-bao/${ann.slug}`}
-                className="flex items-center gap-4 bg-white rounded-xl p-4 md:p-5 border border-[#E8E2D2] hover:border-[#BE4F24]/20 hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-200 group"
+        {/* 2-Column Layout */}
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}>
+          
+          {/* Left: Featured Announcement */}
+          <div 
+            className="flex flex-col p-8 md:p-10 transition-transform duration-500 hover:-translate-y-1"
+            style={{
+              background: 'linear-gradient(135deg, #FFF9EE 0%, #FBEAD8 100%)',
+              border: '1px solid rgba(212, 90, 42, 0.18)',
+              borderRadius: '28px',
+              boxShadow: '0 24px 70px rgba(212, 90, 42, 0.12)'
+            }}
+          >
+            <div className="flex items-center gap-2 mb-6">
+              <span className="flex items-center gap-1.5 px-3 py-1 bg-[#D45A2A] text-white text-[12px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                </svg>
+                Ghim
+              </span>
+              <span className="px-3 py-1 bg-[#111111] text-white text-[12px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                Quan trọng
+              </span>
+            </div>
+            
+            <h3 className="font-heading text-2xl md:text-[28px] font-bold text-[#111111] mb-4 leading-snug">
+              Thông báo giờ hoạt động mùa hè 2026
+            </h3>
+            
+            <p className="text-[#555555] text-[15px] md:text-[16px] leading-relaxed mb-8 flex-1">
+              HaloPadel chính thức cập nhật khung giờ hoạt động mùa hè, hỗ trợ khách chơi linh hoạt hơn trong ngày. Mở cửa từ sáng sớm để tránh nóng và kéo dài thời gian phục vụ buổi tối.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-6 border-t border-[#D45A2A]/20 mt-auto">
+              <div className="text-[14px] text-[#888888] font-medium flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Áp dụng từ: 01/06/2026
+              </div>
+              
+              <Link 
+                href="/thong-bao"
+                className="inline-flex items-center justify-center gap-2 h-[44px] px-6 bg-transparent border-2 border-[#D45A2A] hover:bg-[#D45A2A] text-[#D45A2A] hover:text-white rounded-xl font-bold text-[14px] transition-colors w-full sm:w-auto"
               >
-                {/* Type icon */}
-                <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center shrink-0 text-base`}>
-                  {config.icon}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    {ann.isPinned && (
-                      <span className="text-[10px] font-bold text-[#BE4F24] bg-[#BE4F24]/8 px-1.5 py-0.5 rounded uppercase tracking-wide">
-                        Ghim
-                      </span>
-                    )}
-                    <span className={`text-[10px] font-semibold ${config.text} ${config.bg} px-1.5 py-0.5 rounded uppercase tracking-wide`}>
-                      {config.label}
-                    </span>
-                  </div>
-                  <h3 className="text-[14px] font-semibold text-[#111111] group-hover:text-[#BE4F24] transition-colors truncate">
-                    {ann.title}
-                  </h3>
-                  <p className="text-[11.5px] text-[#888888] mt-0.5">
-                    {formatRelativeTime(ann.createdAt)}
-                  </p>
-                </div>
-
-                {/* Arrow */}
-                <svg className="w-4 h-4 text-[#CCCCCC] group-hover:text-[#BE4F24] shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                Xem chi tiết
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </Link>
-            )
-          })}
+            </div>
+          </div>
+
+          {/* Right: List of small announcements */}
+          <div className="flex flex-col justify-between space-y-4">
+            {SMALL_ANNOUNCEMENTS.map((ann, index) => (
+              <Link
+                key={ann.id}
+                href="/thong-bao"
+                className="group flex items-center gap-4 p-5 transition-all duration-300"
+                style={{
+                  background: '#FFFDF7',
+                  border: '1px solid rgba(58, 36, 24, 0.1)',
+                  borderRadius: '20px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)'
+                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(58, 36, 24, 0.08)'
+                  e.currentTarget.style.borderColor = 'rgba(212, 90, 42, 0.3)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = 'none'
+                  e.currentTarget.style.borderColor = 'rgba(58, 36, 24, 0.1)'
+                }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-[10px] font-bold ${ann.typeColor} px-2 py-0.5 rounded uppercase tracking-wider`}>
+                      {ann.type}
+                    </span>
+                    <span className="text-[12px] text-[#888888] flex items-center gap-1">
+                      • {ann.time}
+                    </span>
+                  </div>
+                  <h3 className="text-[15px] font-bold text-[#111111] group-hover:text-[#D45A2A] transition-colors truncate">
+                    {ann.title}
+                  </h3>
+                </div>
+                
+                <div className="w-10 h-10 rounded-full bg-[#FFF9EE] flex items-center justify-center shrink-0 group-hover:bg-[#D45A2A] group-hover:text-white text-[#D45A2A] transition-colors">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* View all */}
-        <div className="text-center mt-10">
+        {/* View all CTA */}
+        <div className="text-center mt-12">
           <Link
             href="/thong-bao"
-            className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[#BE4F24] hover:text-[#A9411D] transition-colors"
+            className="inline-flex items-center gap-2 text-[15px] font-bold text-[#D45A2A] hover:text-[#B8431D] transition-colors"
           >
             Xem tất cả thông báo
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </Link>
         </div>

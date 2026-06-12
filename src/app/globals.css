@@ -6,20 +6,20 @@
 
 @theme inline {
   /* Brand Colors */
-  --color-primary: #BE4F24;
-  --color-primary-hover: #A9411D;
-  --color-primary-light: #D4784F;
-  --color-primary-50: #FEF3EE;
-  --color-primary-100: #FCE4D8;
-  --color-primary-200: #F8C5AF;
-  --color-primary-600: #BE4F24;
-  --color-primary-700: #A9411D;
-  --color-primary-800: #8A3518;
+  --color-primary: #D45A2A;
+  --color-primary-hover: #B8431D;
+  --color-primary-light: #E87A4F;
+  --color-primary-50: #FEF6F3;
+  --color-primary-100: #FDE8E0;
+  --color-primary-200: #FAD1C2;
+  --color-primary-600: #D45A2A;
+  --color-primary-700: #B8431D;
+  --color-primary-800: #933212;
 
   /* Background */
-  --color-cream: #F8F5E4;
-  --color-cream-dark: #F0EBD4;
-  --color-card: #FFFDF6;
+  --color-cream: #FFF9EE;
+  --color-cream-dark: #F7F1E3;
+  --color-card: #FFFFFF;
   --color-card-white: #FFFFFF;
 
   /* Text */
@@ -165,6 +165,10 @@ h1, h2, h3, h4, h5, h6 {
   50% { transform: translateY(-4px); }
 }
 
+@keyframes shine {
+  100% { left: 200%; }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
@@ -242,10 +246,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .section-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 @media (min-width: 768px) {

@@ -1,114 +1,173 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+
 export default function PricingSection({ plans, section }) {
-  if (!plans || plans.length === 0) return null
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.1 }
+    )
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  const TABLE_PLANS = [
+    { name: 'Giờ sáng', time: '06:00 - 08:00', price: '200.000đ/giờ', note: 'Giá ưu đãi' },
+    { name: 'Giờ hành chính', time: '08:00 - 17:00', price: '300.000đ/giờ', note: 'Thứ 2 - Thứ 6' },
+    { name: 'Giờ cao điểm', time: '17:00 - 22:00', price: '400.000đ/giờ', note: 'Tất cả các ngày', highlight: true },
+    { name: 'Cuối tuần', time: '08:00 - 17:00', price: '350.000đ/giờ', note: 'Thứ 7 & Chủ nhật' },
+  ]
 
   return (
-    <section id="pricing" className="py-20 md:py-28 bg-[#FFFDF6]">
-      <div className="section-container">
+    <section id="pricing" className="py-20 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
+      <div className="w-full px-4 md:px-8 max-w-[1240px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-14">
-          <p className="text-[13px] font-semibold text-[#BE4F24] uppercase tracking-[0.2em] mb-3">
-            Bảng giá
+        <div className="text-center mb-16">
+          <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
+            Bảng giá sân padel
           </p>
-          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-3">
-            {section?.title || 'Bảng giá thuê sân'}
+          <h2 className="font-heading text-3xl md:text-[2.5rem] font-bold text-[#111111] leading-tight mb-4">
+            Linh hoạt theo khung giờ, ưu đãi tốt cho hội nhóm và khách chơi thường xuyên
           </h2>
-          <p className="text-[#555555] text-base md:text-lg max-w-xl mx-auto leading-relaxed">
-            {section?.subtitle || 'Giá cả hợp lý, nhiều ưu đãi hấp dẫn'}
-          </p>
         </div>
 
-        {/* Pricing Grid */}
-        <div className="max-w-4xl mx-auto">
-          {/* Table Header */}
-          <div className="hidden md:grid grid-cols-[1fr_140px_140px_1fr] gap-0 bg-[#111111] rounded-t-2xl px-6 py-3.5 text-[12px] font-semibold text-white/70 uppercase tracking-wider">
-            <span>Khung giờ</span>
-            <span className="text-center">Thời gian</span>
-            <span className="text-center">Giá</span>
-            <span>Ghi chú</span>
-          </div>
+        {/* Pricing Layout (Table + Card) */}
+        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}>
+          
+          {/* Left: Table (7/12) */}
+          <div className="lg:col-span-7">
+            <div className="bg-white rounded-2xl border border-[#E8E2D2] overflow-hidden shadow-sm">
+              {/* Table Header */}
+              <div className="hidden md:grid grid-cols-[1fr_120px_140px_1fr] gap-0 bg-[#2A1A12] px-6 py-4 text-[13px] font-bold text-white uppercase tracking-wider">
+                <span>Khung giờ</span>
+                <span className="text-center">Thời gian</span>
+                <span className="text-center">Giá</span>
+                <span>Ghi chú</span>
+              </div>
 
-          {/* Table Rows */}
-          <div className="space-y-0">
-            {plans.map((plan, index) => {
-              const isHighlight = plan.notes?.includes('Tiết kiệm')
-              return (
-                <div
-                  key={plan.id}
-                  className={`relative group transition-all duration-200 border border-[#E8E2D2] md:border-t-0 ${
-                    index === 0 ? 'rounded-t-2xl md:rounded-t-none' : ''
-                  } ${index === plans.length - 1 ? 'rounded-b-2xl' : ''} ${
-                    isHighlight
-                      ? 'bg-[#BE4F24]/[0.03] border-[#BE4F24]/20'
-                      : 'bg-white hover:bg-[#F8F5E4]/50'
-                  }`}
-                >
-                  {/* HOT badge */}
-                  {isHighlight && (
-                    <div className="absolute -top-2.5 right-4 md:right-6 px-3 py-0.5 bg-[#BE4F24] text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
-                      Tiết kiệm
-                    </div>
-                  )}
-
-                  {/* Mobile layout */}
-                  <div className="md:hidden p-5">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-semibold text-[15px] text-[#111111]">{plan.name}</h3>
-                        {plan.timeSlot && (
-                          <p className="text-[12px] text-[#888888] mt-0.5">{plan.timeSlot}</p>
-                        )}
+              {/* Table Rows */}
+              <div className="divide-y divide-[#E8E2D2]">
+                {TABLE_PLANS.map((plan, index) => (
+                  <div 
+                    key={index}
+                    className={`p-5 md:px-6 md:py-5 transition-colors ${plan.highlight ? 'bg-[#FFF4E8]' : 'hover:bg-[#F8F5E4]/50'}`}
+                  >
+                    {/* Mobile View */}
+                    <div className="md:hidden">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-bold text-[16px] text-[#111111]">{plan.name}</h3>
+                        <span className="text-[18px] font-bold text-[#D45A2A]">{plan.price}</span>
                       </div>
-                      <span className={`text-lg font-bold ${isHighlight ? 'text-[#BE4F24]' : 'text-[#111111]'}`}>
-                        {plan.price}
-                      </span>
+                      <div className="flex justify-between text-[13px]">
+                        <span className="text-[#555555] font-medium">{plan.time}</span>
+                        <span className="text-[#888888]">{plan.note}</span>
+                      </div>
                     </div>
-                    {plan.description && (
-                      <p className="text-[12px] text-[#555555] mb-1">{plan.description}</p>
-                    )}
-                    {plan.notes && (
-                      <p className="text-[11px] text-[#888888]">{plan.notes}</p>
-                    )}
-                  </div>
 
-                  {/* Desktop layout - table row */}
-                  <div className="hidden md:grid grid-cols-[1fr_140px_140px_1fr] gap-0 items-center px-6 py-4">
-                    <div>
-                      <h3 className="font-semibold text-[14px] text-[#111111]">{plan.name}</h3>
-                      {plan.description && (
-                        <p className="text-[12px] text-[#888888] mt-0.5">{plan.description}</p>
-                      )}
+                    {/* Desktop View */}
+                    <div className="hidden md:grid grid-cols-[1fr_120px_140px_1fr] gap-0 items-center">
+                      <h3 className="font-bold text-[15px] text-[#111111]">{plan.name}</h3>
+                      <span className="text-center text-[14px] text-[#555555] font-medium">{plan.time}</span>
+                      <span className="text-center text-[18px] font-bold text-[#D45A2A]">{plan.price}</span>
+                      <span className="text-[13px] text-[#888888]">{plan.note}</span>
                     </div>
-                    <span className="text-center text-[13px] text-[#555555] font-medium">
-                      {plan.timeSlot || '—'}
-                    </span>
-                    <span className={`text-center text-[16px] font-bold ${isHighlight ? 'text-[#BE4F24]' : 'text-[#111111]'}`}>
-                      {plan.price}
-                    </span>
-                    <span className="text-[12px] text-[#888888]">
-                      {plan.notes || '—'}
-                    </span>
                   </div>
-                </div>
-              )
-            })}
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Membership Card (5/12) */}
+          <div className="lg:col-span-5">
+            <div 
+              className="relative p-8 md:p-10 text-center transition-transform hover:-translate-y-2 duration-500"
+              style={{
+                background: 'linear-gradient(180deg, #FFF9EE 0%, #FBEAD8 100%)',
+                border: '1px solid rgba(212, 90, 42, 0.22)',
+                boxShadow: '0 24px 70px rgba(212, 90, 42, 0.14)',
+                borderRadius: '28px'
+              }}
+            >
+              {/* Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-[#D45A2A] text-white text-[12px] font-bold uppercase tracking-widest rounded-full shadow-lg whitespace-nowrap">
+                Phổ biến nhất
+              </div>
+
+              <h3 className="font-heading text-2xl md:text-3xl font-bold text-[#111111] mb-3 mt-2">
+                Gói tháng tiết kiệm
+              </h3>
+              <p className="text-[#555555] text-[14px] leading-relaxed mb-6">
+                Dành cho người chơi thường xuyên hoặc nhóm bạn cố định
+              </p>
+              
+              <div className="mb-6 flex justify-center items-end gap-1">
+                <span className="text-4xl md:text-5xl font-bold text-[#D45A2A]">3.500.000đ</span>
+                <span className="text-[#888888] font-medium text-lg mb-1">/tháng</span>
+              </div>
+
+              <ul className="text-left space-y-4 mb-8 max-w-[260px] mx-auto">
+                <li className="flex items-center gap-3 text-[#111111] font-medium">
+                  <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  12 giờ chơi linh hoạt
+                </li>
+                <li className="flex items-center gap-3 text-[#111111] font-medium">
+                  <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Tiết kiệm 25% so với đặt lẻ
+                </li>
+                <li className="flex items-center gap-3 text-[#111111] font-medium">
+                  <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Giữ cố định khung giờ
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="text-center mt-12">
-          <p className="text-[14px] text-[#555555] mb-4">
-            Liên hệ để được tư vấn gói phù hợp nhất
+        {/* CTA Section */}
+        <div className="text-center mt-16 max-w-2xl mx-auto">
+          <p className="text-[15px] font-medium text-[#111111] mb-6">
+            Chưa biết chọn khung giờ nào? Đội ngũ HaloPadel sẽ tư vấn lịch chơi phù hợp cho bạn.
           </p>
-          <a
-            href="tel:0909123456"
-            className="inline-flex items-center gap-2.5 h-[48px] px-8 bg-[#BE4F24] hover:bg-[#A9411D] text-white rounded-2xl font-semibold text-[15px] transition-all duration-200 hover:-translate-y-0.5"
-            style={{ boxShadow: '0 4px 14px rgba(190,79,36,0.25)' }}
-          >
-            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-            </svg>
-            Liên hệ tư vấn
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* Zalo Button */}
+            <a
+              href="https://zalo.me/0909123456"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-[52px] px-8 bg-white border-2 border-[#0068FF] text-[#0068FF] rounded-2xl font-bold text-[15px] transition-all duration-300 hover:bg-[#0068FF]/5 hover:shadow-[0_8px_20px_rgba(0,104,255,0.15)] hover:-translate-y-1"
+            >
+              <svg className="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21.384 10.536C21.384 6.223 17.518 2.5 12.5 2.5S3.616 6.223 3.616 10.536c0 2.227 1.056 4.296 2.872 5.753-.16.924-.623 2.535-1.026 3.428-.15.334.204.608.528.455 1.765-.836 3.606-1.572 4.417-1.854.673.13 1.384.2 2.115.2 5.018 0 8.862-3.723 8.862-8.036zM11.666 12.392h-1.928v-.54h1.365v-.444h-1.365v-.54h1.928v-.517H9.2v2.558h2.466v-.517zm2.935 0h-.551v-2.558h.551v2.558zm-1.127 0h-.518L12.33 11.23v1.162h-.517v-2.558h.518L12.956 11V9.834h.517v2.558zm3.626-2.023c0 .243-.166.452-.416.518.25.066.416.275.416.518v.47H16.55v-.47c0-.184-.131-.323-.323-.323h-.517v.793h-.517v-2.558h1.034c.192 0 .323.14.323.323v.47c0 .213-.153.376-.356.415.203.04.356.203.356.415v-.06h.55z" />
+              </svg>
+              Chat Zalo ngay
+            </a>
+            
+            {/* Phone Button */}
+            <a
+              href="tel:0909123456"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 h-[52px] px-8 bg-[#D45A2A] hover:bg-[#B8431D] text-white rounded-2xl font-bold text-[15px] transition-all duration-300 hover:shadow-[0_8px_20px_rgba(212,90,42,0.25)] hover:-translate-y-1"
+            >
+              <svg className="w-[20px] h-[20px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+              Gọi tư vấn
+            </a>
+          </div>
         </div>
       </div>
     </section>

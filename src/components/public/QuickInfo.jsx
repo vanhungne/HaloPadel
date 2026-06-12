@@ -11,6 +11,7 @@ export default function QuickInfo({ venue }) {
       ),
       label: 'Địa chỉ',
       value: venue.address,
+      description: 'Đến trực tiếp để tham quan sân',
       href: venue.googleMapsUrl,
       target: '_blank',
     },
@@ -22,6 +23,7 @@ export default function QuickInfo({ venue }) {
       ),
       label: 'Hotline',
       value: venue.hotline,
+      description: 'Tư vấn sân & hỗ trợ khách chơi',
       href: venue.hotline ? `tel:${venue.hotline}` : null,
     },
     {
@@ -32,6 +34,7 @@ export default function QuickInfo({ venue }) {
       ),
       label: 'Zalo',
       value: venue.zalo ? `Zalo: ${venue.zalo}` : null,
+      description: 'Phản hồi nhanh trong giờ mở cửa',
       href: venue.zalo ? `https://zalo.me/${venue.zalo}` : null,
       target: '_blank',
     },
@@ -44,24 +47,29 @@ export default function QuickInfo({ venue }) {
       ),
       label: 'Giờ mở cửa',
       value: '06:00 – 22:00 hàng ngày',
+      description: 'Mở cửa tất cả các ngày trong tuần',
     },
   ].filter((item) => item.value)
 
   return (
-    <section id="quickinfo" className="relative z-20 -mt-10 md:-mt-12">
+    <section id="quickinfo" className="relative z-20 -mt-[8rem] md:-mt-[12rem]">
       <div className="section-container">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {items.map((item, index) => (
             <div
               key={index}
-              className="bg-[#FFFDF6] rounded-2xl p-5 border border-[#E8E2D2] hover:border-[#BE4F24]/20 transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] group"
+              className="bg-[#FFF9EE] rounded-[22px] p-6 group transition-all duration-300 hover:-translate-y-1"
+              style={{
+                border: '1px solid rgba(58, 36, 24, 0.08)',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02)',
+              }}
             >
-              <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#F8F5E4] group-hover:bg-[#BE4F24]/8 flex items-center justify-center shrink-0 text-[#BE4F24] transition-colors duration-300">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#D45A2A]/10 group-hover:bg-[#D45A2A]/15 flex items-center justify-center shrink-0 text-[#D45A2A] transition-colors duration-300">
                   {item.icon}
                 </div>
-                <div className="min-w-0 pt-0.5">
-                  <p className="text-[11px] text-[#888888] font-medium uppercase tracking-[0.12em] mb-1">
+                <div className="min-w-0 pt-1">
+                  <p className="text-[11px] text-[#888888] font-bold uppercase tracking-[0.12em] mb-1.5">
                     {item.label}
                   </p>
                   {item.href ? (
@@ -69,13 +77,18 @@ export default function QuickInfo({ venue }) {
                       href={item.href}
                       target={item.target}
                       rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                      className="text-[13.5px] font-semibold text-[#111111] hover:text-[#BE4F24] transition-colors break-words leading-snug"
+                      className="text-[14px] font-bold text-[#111111] hover:text-[#D45A2A] transition-colors break-words leading-snug block mb-1"
                     >
                       {item.value}
                     </a>
                   ) : (
-                    <p className="text-[13.5px] font-semibold text-[#111111] break-words leading-snug">
+                    <p className="text-[14px] font-bold text-[#111111] break-words leading-snug block mb-1">
                       {item.value}
+                    </p>
+                  )}
+                  {item.description && (
+                    <p className="text-[12.5px] text-[#555555] leading-snug">
+                      {item.description}
                     </p>
                   )}
                 </div>
