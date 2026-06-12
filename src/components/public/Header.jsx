@@ -112,13 +112,22 @@ export default function Header({ venue }) {
         </div>
       </div>
 
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
       {/* Mobile Menu */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ${
-          isMenuOpen ? 'max-h-[28rem] opacity-100' : 'max-h-0 opacity-0'
+        className={`lg:hidden fixed left-0 right-0 z-40 overflow-hidden transition-all duration-300 ${
+          isMenuOpen ? 'max-h-[100vh] opacity-100' : 'max-h-0 opacity-0'
         }`}
+        style={{ top: isScrolled ? '60px' : '72px' }}
       >
-        <div className="bg-[#FFF9EE] border-t border-[#E8E2D2] px-4 py-4">
+        <div className="bg-[#FFF9EE] border-t border-[#E8E2D2] px-4 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.1)]">
           <nav className="space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href
