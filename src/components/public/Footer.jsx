@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { NAV_ITEMS } from '@/lib/constants'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import { localize } from '@/lib/i18n/localize'
 
 export default function Footer({ venue }) {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const currentYear = new Date().getFullYear()
 
   let parsedHours = []
@@ -60,7 +61,7 @@ export default function Footer({ venue }) {
               </div>
             </div>
             <p className="text-white/40 text-[13px] leading-relaxed mb-5">
-              {venue?.shortDesc || t.footer.defaultDesc}
+              {localize(venue, 'shortDesc', locale) || t.footer.defaultDesc}
             </p>
             {/* Social Links */}
             <div className="flex items-center gap-2.5">

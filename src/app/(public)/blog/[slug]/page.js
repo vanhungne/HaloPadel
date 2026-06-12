@@ -4,9 +4,12 @@ import Link from 'next/link'
 import { formatDate } from '@/lib/utils'
 import { prisma } from '@/lib/prisma'
 import { VENUE_ID } from '@/lib/constants'
+import { getServerT } from '@/lib/i18n/server'
+import { localize } from '@/lib/i18n/localize'
 
 export default async function BlogDetailPage({ params }) {
   const { slug } = await params
+  const { t, locale } = await getServerT()
 
   if (!slug) notFound()
 
@@ -20,14 +23,13 @@ export default async function BlogDetailPage({ params }) {
     }
   })
 
-
   if (!post || post.status !== 'PUBLISHED' || post.isDeleted) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center bg-[#FFFDF6]">
-        <h1 className="text-4xl font-bold text-[#111111] mb-4">404 - Không tìm thấy</h1>
-        <p className="text-[#555555] mb-8">Bài viết bạn đang tìm không tồn tại hoặc đã bị xóa.</p>
+        <h1 className="text-4xl font-bold text-[#111111] mb-4">404</h1>
+        <p className="text-[#555555] mb-8">{locale === 'en' ? 'The article you are looking for does not exist or has been removed.' : 'Bài viết bạn đang tìm không tồn tại hoặc đã bị xóa.'}</p>
         <Link href="/blog" className="px-6 py-3 bg-[#D45A2A] text-white rounded-full font-bold">
-          Quay lại danh sách Blog
+          {locale === 'en' ? 'Back to Blog' : 'Quay lại danh sách Blog'}
         </Link>
       </div>
     )
@@ -45,6 +47,8 @@ export default async function BlogDetailPage({ params }) {
     take: 3
   })
 
+  const readTime = Math.ceil((post.content?.length || 1000) / 1000)
+
   return (
     <div className="py-12 md:py-24 bg-[#FFFDF6] min-h-screen">
       <div className="w-full px-4 md:px-8 max-w-[900px] mx-auto">
@@ -53,13 +57,13 @@ export default async function BlogDetailPage({ params }) {
         <div className="flex items-center gap-2 text-[13px] font-semibold mb-8 text-[#888888]">
           <Link href="/blog" className="hover:text-[#D45A2A] transition-colors">Blog</Link>
           <span>/</span>
-          <span className="text-[#D45A2A] uppercase tracking-wider">{post.category?.name || 'TIN TỨC'}</span>
+          <span className="text-[#D45A2A] uppercase tracking-wider">{post.category?.name || 'Blog'}</span>
         </div>
 
         {/* Header */}
         <div className="mb-10">
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-[#111111] mb-6 leading-[1.15]">
-            {post.title}
+            {localize(post, 'title', locale)}
           </h1>
           
           <div className="flex items-center gap-6 pt-6 border-t border-[#E8E2D2]">
@@ -72,7 +76,7 @@ export default async function BlogDetailPage({ params }) {
                 <div className="flex items-center gap-3 text-[13px] text-[#888888] font-medium mt-0.5">
                   <span>{formatDate(post.publishedAt || post.createdAt)}</span>
                   <span className="w-1 h-1 rounded-full bg-[#E8E2D2]" />
-                  <span>{Math.ceil((post.content?.length || 1000) / 1000)} phút đọc</span>
+                  <span>{readTime} {t.common.minuteRead}</span>
                 </div>
               </div>
             </div>
@@ -93,7 +97,7 @@ export default async function BlogDetailPage({ params }) {
         <div className="relative w-full h-[300px] md:h-[450px] lg:h-[550px] rounded-[32px] overflow-hidden shadow-sm border border-[#E8E2D2] mb-12">
           <Image 
             src={post.coverImage || '/images/gallery/gallery_action.png'} 
-            alt={post.title} 
+            alt={localize(post, 'title', locale)} 
             fill 
             className="object-cover"
             priority
@@ -103,9 +107,9 @@ export default async function BlogDetailPage({ params }) {
         {/* Article Body */}
         <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-headings:text-[#111111] prose-p:text-[#555555] prose-p:leading-[1.8] prose-a:text-[#D45A2A] prose-blockquote:border-l-4 prose-blockquote:border-[#D45A2A] prose-blockquote:bg-[#FFF9EE] prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-xl prose-blockquote:font-medium prose-blockquote:text-[#111111] prose-blockquote:not-italic">
           <p className="text-xl md:text-2xl text-[#111111] font-medium leading-relaxed mb-10">
-            {post.excerpt}
+            {localize(post, 'excerpt', locale)}
           </p>
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div dangerouslySetInnerHTML={{ __html: locale === 'en' ? (post.contentEn || post.content) : post.content }} />
         </div>
 
       </div>
@@ -115,10 +119,10 @@ export default async function BlogDetailPage({ params }) {
         <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto mt-24">
           <div className="flex items-center justify-between mb-10 border-t border-[#E8E2D2] pt-12">
             <h2 className="font-heading text-3xl font-bold text-[#111111]">
-              Bài viết cùng chủ đề
+              {locale === 'en' ? 'Related Articles' : 'Bài viết cùng chủ đề'}
             </h2>
             <Link href="/blog" className="hidden sm:inline-flex items-center gap-2 text-[#D45A2A] font-bold hover:gap-3 transition-all">
-              Xem tất cả <span aria-hidden="true">&rarr;</span>
+              {t.common.viewAll} <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
 
@@ -132,21 +136,21 @@ export default async function BlogDetailPage({ params }) {
                 <div className="relative w-full h-[220px] overflow-hidden">
                   <Image 
                     src={blog.coverImage || '/images/gallery/gallery_action.png'} 
-                    alt={blog.title} 
+                    alt={localize(blog, 'title', locale)} 
                     fill 
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-[#111111] px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider shadow-sm">
-                    {blog.category?.name || 'TIN TỨC'}
+                    {blog.category?.name || 'Blog'}
                   </div>
                 </div>
                 
                 <div className="p-6 md:p-8 flex flex-col flex-1">
                   <h3 className="font-heading text-xl font-bold text-[#111111] mb-3 leading-snug group-hover:text-[#D45A2A] transition-colors line-clamp-2">
-                    {blog.title}
+                    {localize(blog, 'title', locale)}
                   </h3>
                   <p className="text-[#555555] text-[15px] mb-6 line-clamp-3 leading-relaxed flex-1">
-                    {blog.excerpt}
+                    {localize(blog, 'excerpt', locale)}
                   </p>
                   
                   <div className="mt-auto flex items-center justify-between border-t border-[#E8E2D2] pt-5">
@@ -154,7 +158,7 @@ export default async function BlogDetailPage({ params }) {
                       {formatDate(blog.publishedAt || blog.createdAt)}
                     </span>
                     <span className="text-[#D45A2A] font-bold text-[13px] flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Đọc tiếp <span aria-hidden="true">&rarr;</span>
+                      {t.common.readMore} <span aria-hidden="true">&rarr;</span>
                     </span>
                   </div>
                 </div>
