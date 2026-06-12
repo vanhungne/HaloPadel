@@ -261,6 +261,7 @@ model Amenity {
   venueId      Int
   name         String   @db.NVarChar(100)
   icon         String?  @db.NVarChar(100)
+  image        String?  @db.NVarChar(1000)
   description  String?  @db.NVarChar(300)
   displayOrder Int      @default(0)
   isActive     Boolean  @default(true)

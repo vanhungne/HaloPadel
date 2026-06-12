@@ -10,7 +10,13 @@ import AnnouncementsSection from '@/components/public/AnnouncementsSection'
 import BlogSection from '@/components/public/BlogSection'
 import GoogleMap from '@/components/public/GoogleMap'
 
+import { getSeoMetadata, SchemaMarkup } from '@/lib/seo'
+
 export const revalidate = 60 // ISR: revalidate every 60 seconds
+
+export async function generateMetadata() {
+  return await getSeoMetadata('home', 'HaloPadel - Sân Padel chuyên nghiệp')
+}
 
 async function getLandingData() {
   const now = new Date()
@@ -120,8 +126,12 @@ export default async function HomePage() {
   }
 
   return (
-    <div style={{ marginTop: '-72px' }}>
-      {sectionOrder.map((key) => sectionComponents[key] || null)}
-    </div>
+
+    <>
+      <SchemaMarkup pageKey="home" />
+      <div style={{ marginTop: '-76px' }}>
+        {sectionOrder.map((key) => sectionComponents[key] || null)}
+      </div>
+    </>
   )
 }

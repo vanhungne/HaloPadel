@@ -3,16 +3,12 @@ import { VENUE_ID } from '@/lib/constants'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { getSeoMetadata, SchemaMarkup } from '@/lib/seo'
+
 export const revalidate = 60
 
 export async function generateMetadata() {
-  const seo = await prisma.seoSetting.findUnique({
-    where: { venueId_pageKey: { venueId: VENUE_ID, pageKey: 'about' } },
-  })
-  return {
-    title: seo?.metaTitle || 'Giới thiệu HaloPadel',
-    description: seo?.metaDescription || 'Tìm hiểu về không gian sân thể thao HaloPadel tại Đà Nẵng',
-  }
+  return await getSeoMetadata('about', 'Giới thiệu HaloPadel')
 }
 
 async function getAboutData() {
@@ -24,7 +20,9 @@ export default async function AboutPage() {
   const { venue } = await getAboutData()
 
   return (
-    <div className="bg-[#FFFDF6] overflow-hidden">
+    <>
+      <SchemaMarkup pageKey="about" />
+      <div className="bg-[#FFFDF6] overflow-hidden">
       
       {/* SECTION 1: HERO */}
       <section className="py-20 md:py-28 bg-white border-b border-[#E8E2D2]">
@@ -264,5 +262,6 @@ export default async function AboutPage() {
       </section>
 
     </div>
+    </>
   )
 }

@@ -1,13 +1,25 @@
 'use client'
 
 import { useState } from 'react'
+import ContactModal from '@/components/public/ContactModal'
 
 export default function FloatingCTA({ venue }) {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   if (!venue?.hotline && !venue?.zalo && !venue?.googleMapsUrl) return null
 
   const items = [
+    {
+      isButton: true,
+      onClick: () => setIsModalOpen(true),
+      icon: (
+        <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      ),
+      label: 'Tư vấn',
+      highlight: false,
+    },
     venue?.hotline && {
       icon: (
         <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
@@ -45,30 +57,46 @@ export default function FloatingCTA({ venue }) {
     <>
       {/* ===== DESKTOP: Vertical Quick Action ===== */}
       <div className="hidden md:flex fixed right-[32px] bottom-[36px] z-40 flex-col gap-[14px] items-end pointer-events-none">
-        {items.map((item, i) => (
-          <a
-            key={i}
-            href={item.href}
-            target={item.target}
-            rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-            className={`pointer-events-auto flex items-center justify-center gap-3 h-[48px] px-4 rounded-full transition-all duration-300 hover:-translate-y-1 overflow-hidden group ${
-              item.highlight
-                ? 'bg-[#D45A2A] text-white hover:bg-[#B8431D]'
-                : 'bg-white text-[#555555] hover:text-[#D45A2A]'
-            }`}
-            style={{
-              boxShadow: item.highlight 
-                ? '0 8px 24px rgba(212, 90, 42, 0.35)' 
-                : '0 4px 16px rgba(0,0,0,0.08)',
-              border: item.highlight ? 'none' : '1px solid rgba(58, 36, 24, 0.15)',
-            }}
-          >
-            <div className="shrink-0">{item.icon}</div>
-            <span className="text-[14px] font-bold whitespace-nowrap overflow-hidden w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 transition-all duration-300">
-              {item.label}
-            </span>
-          </a>
-        ))}
+        {items.map((item, i) => {
+          const className = `pointer-events-auto flex items-center justify-center gap-3 h-[48px] px-4 rounded-full transition-all duration-300 hover:-translate-y-1 overflow-hidden group ${
+            item.highlight
+              ? 'bg-[#D45A2A] text-white hover:bg-[#B8431D]'
+              : 'bg-white text-[#555555] hover:text-[#D45A2A]'
+          }`
+          const style = {
+            boxShadow: item.highlight 
+              ? '0 8px 24px rgba(212, 90, 42, 0.35)' 
+              : '0 4px 16px rgba(0,0,0,0.08)',
+            border: item.highlight ? 'none' : '1px solid rgba(58, 36, 24, 0.15)',
+          }
+
+          if (item.isButton) {
+            return (
+              <button key={i} onClick={item.onClick} className={className} style={style}>
+                <div className="shrink-0">{item.icon}</div>
+                <span className="text-[14px] font-bold whitespace-nowrap overflow-hidden w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 transition-all duration-300">
+                  {item.label}
+                </span>
+              </button>
+            )
+          }
+
+          return (
+            <a
+              key={i}
+              href={item.href}
+              target={item.target}
+              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+              className={className}
+              style={style}
+            >
+              <div className="shrink-0">{item.icon}</div>
+              <span className="text-[14px] font-bold whitespace-nowrap overflow-hidden w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 transition-all duration-300">
+                {item.label}
+              </span>
+            </a>
+          )
+        })}
       </div>
 
       {/* ===== MOBILE: Bottom Sticky Bar ===== */}
@@ -82,29 +110,47 @@ export default function FloatingCTA({ venue }) {
           boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
         }}
       >
-        <div className="flex items-center justify-around py-2.5 px-3 gap-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
-          {items.map((item, i) => (
-            <a
-              key={i}
-              href={item.href}
-              target={item.target}
-              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-              className={`flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl transition-colors ${
-                item.highlight
-                  ? 'bg-[#D45A2A] text-white'
-                  : 'bg-white text-[#555555] border border-[rgba(58,36,24,0.08)]'
-              }`}
-            >
-              {item.icon}
-              <span className={`text-[12px] font-bold ${item.highlight ? 'text-white' : 'text-[#333333]'}`}>
-                {item.label}
-              </span>
-            </a>
-          ))}
+
+        <div className="flex items-center justify-around py-2 px-3 gap-2" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
+          {items.map((item, i) => {
+            const className = `flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl transition-colors ${
+              item.highlight
+                ? 'bg-[#D45A2A] text-white'
+                : 'bg-white text-[#555555] border border-[rgba(58,36,24,0.08)]'
+            }`
+
+            if (item.isButton) {
+              return (
+                <button key={i} onClick={item.onClick} className={className}>
+                  {item.icon}
+                  <span className={`text-[12px] font-bold ${item.highlight ? 'text-white' : 'text-[#333333]'}`}>
+                    {item.label}
+                  </span>
+                </button>
+              )
+            }
+
+            return (
+              <a
+                key={i}
+                href={item.href}
+                target={item.target}
+                rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                className={className}
+              >
+                {item.icon}
+                <span className={`text-[12px] font-bold ${item.highlight ? 'text-white' : 'text-[#333333]'}`}>
+                  {item.label}
+                </span>
+              </a>
+            )
+          })}
         </div>
 
         {/* Safe area spacer for iOS bottom notch - use padding instead */}
       </div>
+
+      <ContactModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   )
 }

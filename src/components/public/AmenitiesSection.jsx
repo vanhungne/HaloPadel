@@ -42,7 +42,16 @@ const PHOTO_AMENITIES = [
   }
 ]
 
-export default function AmenitiesSection({ section }) {
+  const FALLBACK_IMAGES = [
+    '/images/amenities/parking.png',
+    '/images/amenities/cafe.png',
+    '/images/amenities/lounge.png',
+    '/images/amenities/rackets.png',
+    '/images/amenities/lights.png',
+    '/images/amenities/locker.png',
+  ]
+
+export default function AmenitiesSection({ amenities, section }) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
 
@@ -59,6 +68,8 @@ export default function AmenitiesSection({ section }) {
     if (sectionRef.current) observer.observe(sectionRef.current)
     return () => observer.disconnect()
   }, [])
+
+  const displayList = amenities?.length > 0 ? amenities : PHOTO_AMENITIES;
 
   return (
     <section id="amenities" className="py-14 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
@@ -103,39 +114,43 @@ export default function AmenitiesSection({ section }) {
           </div>
 
           {/* Right Cards Grid */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-            {PHOTO_AMENITIES.map((item, index) => (
-              <div 
-                key={item.id}
-                className={`group bg-white rounded-xl overflow-hidden border border-[#E8E2D2] hover:border-[#D45A2A]/40 transition-all duration-700 hover:shadow-[0_20px_40px_rgba(212,90,42,0.12)] hover:-translate-y-1.5 ${
-                  isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-24 scale-[0.98]'
-                }`}
-                style={{ transitionDelay: `${index * 150}ms` }}
-              >
-                {/* Image Half */}
-                <div className="relative h-[180px] sm:h-[220px] overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover group-hover:scale-[1.08] transition-transform duration-[1s] ease-out"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
-                  />
-                  {/* Subtle Light Sweep */}
-                  <div className="absolute top-0 -left-[100%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg] group-hover:animate-[shine_1s_ease-in-out_forwards] z-10 pointer-events-none" />
+
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
+            {displayList.map((item, index) => {
+              const imageSrc = item.image || '/images/gallery/gallery_lounge.png';
+              return (
+                <div 
+                  key={item.id}
+                  className={`group bg-white rounded-xl overflow-hidden border border-[#E8E2D2] hover:border-[#D45A2A]/40 transition-all duration-700 hover:shadow-[0_20px_40px_rgba(212,90,42,0.12)] hover:-translate-y-1.5 ${
+                    isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-24 scale-[0.98]'
+                  }`}
+                  style={{ transitionDelay: `${index * 150}ms` }}
+                >
+                  {/* Image Half */}
+                  <div className="relative h-[220px] overflow-hidden">
+                    <Image
+                      src={imageSrc}
+                      alt={item.name}
+                      fill
+                      className="object-cover group-hover:scale-[1.08] transition-transform duration-[1s] ease-out"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
+                    />
+                    {/* Subtle Light Sweep */}
+                    <div className="absolute top-0 -left-[100%] w-[50%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg] group-hover:animate-[shine_1s_ease-in-out_forwards] z-10 pointer-events-none" />
+                  </div>
+                  
+                  {/* Content Half */}
+                  <div className="p-7">
+                    <h4 className="text-[18px] font-bold text-[#111111] mb-2 group-hover:text-[#D45A2A] transition-colors">
+                      {item.name}
+                    </h4>
+                    <p className="text-[#555555] text-[14px] leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-                
-                {/* Content Half */}
-                <div className="p-5 sm:p-7">
-                  <h4 className="text-[18px] font-bold text-[#111111] mb-2 group-hover:text-[#D45A2A] transition-colors">
-                    {item.name}
-                  </h4>
-                  <p className="text-[#555555] text-[14px] leading-relaxed">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>

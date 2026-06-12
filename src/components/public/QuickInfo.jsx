@@ -1,6 +1,16 @@
 export default function QuickInfo({ venue }) {
   if (!venue) return null
 
+  let hoursValue = '06:00 – 22:00 hàng ngày'
+  try {
+    if (venue.openingHours) {
+      const parsed = JSON.parse(venue.openingHours)
+      if (parsed.length > 0) {
+        hoursValue = `${parsed[0].open} – ${parsed[0].close} hàng ngày`
+      }
+    }
+  } catch (e) {}
+
   const items = [
     {
       icon: (
@@ -46,7 +56,7 @@ export default function QuickInfo({ venue }) {
         </svg>
       ),
       label: 'Giờ mở cửa',
-      value: '06:00 – 22:00 hàng ngày',
+      value: hoursValue,
       description: 'Mở cửa tất cả các ngày trong tuần',
     },
   ].filter((item) => item.value)

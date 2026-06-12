@@ -4,16 +4,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { formatDate } from '@/lib/utils'
 
+import { getSeoMetadata, SchemaMarkup } from '@/lib/seo'
+
 export const revalidate = 60
 
 export async function generateMetadata() {
-  const seo = await prisma.seoSetting.findUnique({
-    where: { venueId_pageKey: { venueId: VENUE_ID, pageKey: 'promotions' } },
-  })
-  return {
-    title: seo?.metaTitle || 'Khuyến mãi',
-    description: seo?.metaDescription || 'Cập nhật các chương trình ưu đãi mới nhất tại HaloPadel',
-  }
+  return await getSeoMetadata('promotions', 'Khuyến mãi HaloPadel')
 }
 
 async function getPromotions() {
@@ -40,7 +36,9 @@ export default async function PromotionsPage() {
   }
 
   return (
-    <div className="py-12 md:py-20 bg-[#FFFDF6] min-h-screen">
+    <>
+      <SchemaMarkup pageKey="promotions" />
+      <div className="py-12 md:py-20 bg-[#FFFDF6] min-h-screen">
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         
         {/* Page Header */}
@@ -184,5 +182,6 @@ export default async function PromotionsPage() {
         )}
       </div>
     </div>
+    </>
   )
 }

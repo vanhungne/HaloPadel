@@ -4,34 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 
-const GALLERY_IMAGES = [
-  {
-    id: 1,
-    url: '/images/gallery/gallery_hero.png',
-    caption: 'Toàn cảnh sân trung tâm ban đêm',
-    gridClass: 'md:col-span-2 md:row-span-2 h-[400px] md:h-full',
-  },
-  {
-    id: 2,
-    url: '/images/gallery/gallery_lounge.png',
-    caption: 'Khu vực Lounge tiếp khách',
-    gridClass: 'md:col-span-1 md:row-span-1 h-[250px] md:h-full',
-  },
-  {
-    id: 3,
-    url: '/images/gallery/gallery_macro.png',
-    caption: 'Mặt sân & Trang thiết bị cao cấp',
-    gridClass: 'md:col-span-1 md:row-span-1 h-[250px] md:h-full',
-  },
-  {
-    id: 4,
-    url: '/images/gallery/gallery_action.png',
-    caption: 'Trải nghiệm thi đấu đỉnh cao',
-    gridClass: 'md:col-span-2 md:row-span-1 h-[280px] md:h-full',
-  }
-]
-
-export default function FeaturedGallery({ section }) {
+export default function FeaturedGallery({ images = [], section }) {
   const [selectedImage, setSelectedImage] = useState(null)
   const [isVisible, setIsVisible] = useState(false)
   const gridRef = useRef(null)
@@ -69,7 +42,9 @@ export default function FeaturedGallery({ section }) {
           ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-4 md:auto-rows-[380px] gap-2.5 md:gap-4 mx-auto"
         >
-          {GALLERY_IMAGES.map((img, index) => (
+          {images.slice(0, 4).map((img, index) => {
+            const gridClass = index === 0 ? 'md:col-span-2 md:row-span-2 h-[400px] md:h-full' : (index === 3 ? 'md:col-span-2 md:row-span-1 h-[280px] md:h-full' : 'md:col-span-1 md:row-span-1 h-[250px] md:h-full');
+            return (
             <div 
               key={img.id} 
               className={`relative rounded-2xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
@@ -110,7 +85,8 @@ export default function FeaturedGallery({ section }) {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* View all CTA */}

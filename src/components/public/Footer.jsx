@@ -4,6 +4,34 @@ import { NAV_ITEMS } from '@/lib/constants'
 export default function Footer({ venue }) {
   const currentYear = new Date().getFullYear()
 
+  let parsedHours = []
+  try {
+    if (venue?.openingHours) {
+      parsedHours = JSON.parse(venue.openingHours)
+    }
+  } catch (e) {}
+  
+  const groupedHours = []
+  if (parsedHours.length > 0) {
+    let currentGroup = { days: [parsedHours[0].day], time: `${parsedHours[0].open} – ${parsedHours[0].close}` }
+    for (let i = 1; i < parsedHours.length; i++) {
+      const time = `${parsedHours[i].open} – ${parsedHours[i].close}`
+      if (time === currentGroup.time) {
+        currentGroup.days.push(parsedHours[i].day)
+      } else {
+        groupedHours.push(currentGroup)
+        currentGroup = { days: [parsedHours[i].day], time }
+      }
+    }
+    groupedHours.push(currentGroup)
+  }
+
+  const renderDays = (days) => {
+    if (days.length === 1) return days[0]
+    if (days.length === 7) return 'Tất cả các ngày'
+    return `${days[0]} – ${days[days.length - 1]}`
+  }
+
   return (
     <footer className="bg-[#111111] text-white">
       {/* Main Footer */}
@@ -96,14 +124,25 @@ export default function Footer({ venue }) {
           <div>
             <h3 className="font-heading font-bold text-[15px] mb-5 text-white/90">Giờ mở cửa</h3>
             <div className="text-[13px] text-white/40 space-y-2.5">
-              <div className="flex justify-between">
-                <span>Thứ 2 – Thứ 6</span>
-                <span className="text-white/80 font-medium">06:00 – 22:00</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Thứ 7 – Chủ nhật</span>
-                <span className="text-white/80 font-medium">06:00 – 23:00</span>
-              </div>
+              {groupedHours.length > 0 ? (
+                groupedHours.map((group, idx) => (
+                  <div key={idx} className="flex justify-between">
+                    <span>{renderDays(group.days)}</span>
+                    <span className="text-white/80 font-medium">{group.time}</span>
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span>Thứ 2 – Thứ 6</span>
+                    <span className="text-white/80 font-medium">06:00 – 22:00</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Thứ 7 – Chủ nhật</span>
+                    <span className="text-white/80 font-medium">06:00 – 23:00</span>
+                  </div>
+                </>
+              )}
               <div className="mt-4 px-3 py-2.5 rounded-xl bg-[#BE4F24]/10 border border-[#BE4F24]/20 text-[#BE4F24] text-[12px] text-center">
                 Mở cửa tất cả các ngày trong tuần
               </div>

@@ -3,16 +3,12 @@ import { VENUE_ID } from '@/lib/constants'
 import GalleryShowcase from '@/components/public/GalleryShowcase'
 import Image from 'next/image'
 
+import { getSeoMetadata, SchemaMarkup } from '@/lib/seo'
+
 export const revalidate = 60
 
 export async function generateMetadata() {
-  const seo = await prisma.seoSetting.findUnique({
-    where: { venueId_pageKey: { venueId: VENUE_ID, pageKey: 'gallery' } },
-  })
-  return {
-    title: seo?.metaTitle || 'Hình ảnh',
-    description: seo?.metaDescription || 'Khám phá không gian tập luyện đẳng cấp tại HaloPadel',
-  }
+  return await getSeoMetadata('gallery', 'Hình ảnh HaloPadel')
 }
 
 async function getGalleryData() {
@@ -34,7 +30,9 @@ export default async function GalleryPage() {
   const heroImage = images.find(img => img.category === 'HERO') || images.find(img => img.category === 'GALLERY') || images[0]
 
   return (
-    <div className="py-12 md:py-20 bg-[#FFFDF6] min-h-screen">
+    <>
+      <SchemaMarkup pageKey="gallery" />
+      <div className="py-12 md:py-20 bg-[#FFFDF6] min-h-screen">
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         
         {/* Page Header */}
@@ -68,5 +66,6 @@ export default async function GalleryPage() {
         
       </div>
     </div>
+    </>
   )
 }

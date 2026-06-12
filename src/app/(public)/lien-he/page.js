@@ -2,16 +2,12 @@ import { prisma } from '@/lib/prisma'
 import { VENUE_ID } from '@/lib/constants'
 import GoogleMap from '@/components/public/GoogleMap'
 
+import { getSeoMetadata, SchemaMarkup } from '@/lib/seo'
+
 export const revalidate = 60
 
 export async function generateMetadata() {
-  const seo = await prisma.seoSetting.findUnique({
-    where: { venueId_pageKey: { venueId: VENUE_ID, pageKey: 'contact' } },
-  })
-  return {
-    title: seo?.metaTitle || 'Liên hệ',
-    description: seo?.metaDescription || 'Thông tin liên hệ và bản đồ đường đi đến HaloPadel',
-  }
+  return await getSeoMetadata('contact', 'Liên hệ HaloPadel')
 }
 
 async function getVenueData() {
@@ -24,7 +20,9 @@ export default async function ContactPage() {
   const venue = await getVenueData()
 
   return (
-    <div className="pt-24 pb-12 md:pb-20 bg-[#FFFDF6] min-h-screen">
+    <>
+      <SchemaMarkup pageKey="contact" />
+      <div className="pt-24 pb-12 md:pb-20 bg-[#FFFDF6] min-h-screen">
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         
         {/* Page Header */}
@@ -46,5 +44,6 @@ export default async function ContactPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }

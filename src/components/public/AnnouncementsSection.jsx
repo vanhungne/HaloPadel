@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
+import { formatDate } from '@/lib/utils'
 
-export default function AnnouncementsSection({ section }) {
+export default function AnnouncementsSection({ section, announcements = [] }) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
 
@@ -21,36 +23,20 @@ export default function AnnouncementsSection({ section }) {
     return () => observer.disconnect()
   }, [])
 
-  const SMALL_ANNOUNCEMENTS = [
-    {
-      id: 1,
-      type: 'Sự kiện',
-      typeColor: 'text-amber-600 bg-amber-50',
-      title: 'Giải đấu Padel mở rộng tháng 7/2026',
-      time: '2 ngày trước'
-    },
-    {
-      id: 2,
-      type: 'Bảo trì',
-      typeColor: 'text-gray-600 bg-gray-100',
-      title: 'Lịch bảo trì sân tuần này (Cụm sân A)',
-      time: '4 ngày trước'
-    },
-    {
-      id: 3,
-      type: 'Ưu đãi',
-      typeColor: 'text-[#D45A2A] bg-[#D45A2A]/10',
-      title: 'Ưu đãi gói tháng đặc biệt cho hội nhóm',
-      time: '1 tuần trước'
-    },
-    {
-      id: 4,
-      type: 'Thông tin',
-      typeColor: 'text-blue-600 bg-blue-50',
-      title: 'Cập nhật quy định thuê vợt và check-in',
-      time: '2 tuần trước'
+  if (!announcements || announcements.length === 0) return null;
+
+  const featured = announcements.find(a => a.isPinned) || announcements[0]
+  const listAnnouncements = announcements.filter(a => a.id !== featured?.id).slice(0, 4)
+
+  const getTypeStyle = (type) => {
+    switch (type) {
+      case 'INFO': return { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Thông tin' }
+      case 'EVENT': return { bg: 'bg-amber-50', text: 'text-amber-600', label: 'Sự kiện' }
+      case 'PROMO': return { bg: 'bg-[#D45A2A]/10', text: 'text-[#D45A2A]', label: 'Ưu đãi' }
+      case 'MAINTENANCE': return { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Bảo trì' }
+      default: return { bg: 'bg-blue-50', text: 'text-blue-600', label: 'Thông báo' }
     }
-  ]
+  }
 
   return (
     <section id="announcements" className="py-14 md:py-24 bg-[#FFFDF6]" ref={sectionRef}>
@@ -72,99 +58,111 @@ export default function AnnouncementsSection({ section }) {
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}>
           
           {/* Left: Featured Announcement */}
-          <div 
-            className="flex flex-col p-6 sm:p-8 md:p-10 transition-transform duration-500 hover:-translate-y-1"
-            style={{
-              background: 'linear-gradient(135deg, #FFF9EE 0%, #FBEAD8 100%)',
-              border: '1px solid rgba(212, 90, 42, 0.18)',
-              borderRadius: '28px',
-              boxShadow: '0 24px 70px rgba(212, 90, 42, 0.12)'
-            }}
-          >
-            <div className="flex items-center gap-2 mb-6">
-              <span className="flex items-center gap-1.5 px-3 py-1 bg-[#D45A2A] text-white text-[12px] font-bold uppercase tracking-wider rounded-md shadow-sm">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                </svg>
-                Ghim
-              </span>
-              <span className="px-3 py-1 bg-[#111111] text-white text-[12px] font-bold uppercase tracking-wider rounded-md shadow-sm">
-                Quan trọng
-              </span>
-            </div>
-            
-            <h3 className="font-heading text-2xl md:text-[28px] font-bold text-[#111111] mb-4 leading-snug">
-              Thông báo giờ hoạt động mùa hè 2026
-            </h3>
-            
-            <p className="text-[#555555] text-[15px] md:text-[16px] leading-relaxed mb-8 flex-1">
-              HaloPadel chính thức cập nhật khung giờ hoạt động mùa hè, hỗ trợ khách chơi linh hoạt hơn trong ngày. Mở cửa từ sáng sớm để tránh nóng và kéo dài thời gian phục vụ buổi tối.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-6 border-t border-[#D45A2A]/20 mt-auto">
-              <div className="text-[14px] text-[#888888] font-medium flex items-center gap-2">
-                <svg className="w-4 h-4 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Áp dụng từ: 01/06/2026
+
+          {featured && (
+            <div 
+              className="flex flex-col p-8 md:p-10 transition-transform duration-500 hover:-translate-y-1"
+              style={{
+                background: 'linear-gradient(135deg, #FFF9EE 0%, #FBEAD8 100%)',
+                border: '1px solid rgba(212, 90, 42, 0.18)',
+                borderRadius: '28px',
+                boxShadow: '0 24px 70px rgba(212, 90, 42, 0.12)'
+              }}
+            >
+              {featured.image && (
+                <div className="w-full h-[220px] relative rounded-[20px] mb-6 overflow-hidden">
+                  <Image src={featured.image} alt={featured.title} fill className="object-cover" />
+                </div>
+              )}
+              
+              <div className="flex items-center gap-2 mb-6">
+                <span className="flex items-center gap-1.5 px-3 py-1 bg-[#D45A2A] text-white text-[12px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                  </svg>
+                  Ghim
+                </span>
+                <span className="px-3 py-1 bg-[#111111] text-white text-[12px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                  Quan trọng
+                </span>
               </div>
               
-              <Link 
-                href="/thong-bao"
-                className="inline-flex items-center justify-center gap-2 h-[44px] px-6 bg-transparent border-2 border-[#D45A2A] hover:bg-[#D45A2A] text-[#D45A2A] hover:text-white rounded-xl font-bold text-[14px] transition-colors w-full sm:w-auto"
-              >
-                Xem chi tiết
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </Link>
+              <h3 className="font-heading text-2xl md:text-[28px] font-bold text-[#111111] mb-4 leading-snug">
+                {featured.title}
+              </h3>
+              
+              <p className="text-[#555555] text-[15px] md:text-[16px] leading-relaxed mb-8 flex-1 line-clamp-3">
+                {featured.content?.substring(0, 150)}...
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-6 border-t border-[#D45A2A]/20 mt-auto">
+                <div className="text-[14px] text-[#888888] font-medium flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {featured.startDate ? `Áp dụng từ: ${formatDate(featured.startDate)}` : `Đăng ngày: ${formatDate(featured.createdAt)}`}
+                </div>
+                
+                <Link 
+                  href={`/thong-bao/${featured.id}`}
+                  className="inline-flex items-center justify-center gap-2 h-[44px] px-6 bg-transparent border-2 border-[#D45A2A] hover:bg-[#D45A2A] text-[#D45A2A] hover:text-white rounded-xl font-bold text-[14px] transition-colors w-full sm:w-auto"
+                >
+                  Xem chi tiết
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Right: List of small announcements */}
           <div className="flex flex-col justify-between space-y-4">
-            {SMALL_ANNOUNCEMENTS.map((ann, index) => (
-              <Link
-                key={ann.id}
-                href="/thong-bao"
-                className="group flex items-center gap-4 p-5 transition-all duration-300"
-                style={{
-                  background: '#FFFDF7',
-                  border: '1px solid rgba(58, 36, 24, 0.1)',
-                  borderRadius: '20px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px)'
-                  e.currentTarget.style.boxShadow = '0 16px 40px rgba(58, 36, 24, 0.08)'
-                  e.currentTarget.style.borderColor = 'rgba(212, 90, 42, 0.3)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = 'none'
-                  e.currentTarget.style.borderColor = 'rgba(58, 36, 24, 0.1)'
-                }}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`text-[10px] font-bold ${ann.typeColor} px-2 py-0.5 rounded uppercase tracking-wider`}>
-                      {ann.type}
-                    </span>
-                    <span className="text-[12px] text-[#888888] flex items-center gap-1">
-                      • {ann.time}
-                    </span>
+            {listAnnouncements.map((ann) => {
+              const style = getTypeStyle(ann.type)
+              return (
+                <Link
+                  key={ann.id}
+                  href={`/thong-bao/${ann.id}`}
+                  className="group flex items-center gap-4 p-5 transition-all duration-300"
+                  style={{
+                    background: '#FFFDF7',
+                    border: '1px solid rgba(58, 36, 24, 0.1)',
+                    borderRadius: '20px',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px)'
+                    e.currentTarget.style.boxShadow = '0 16px 40px rgba(58, 36, 24, 0.08)'
+                    e.currentTarget.style.borderColor = 'rgba(212, 90, 42, 0.3)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = 'none'
+                    e.currentTarget.style.borderColor = 'rgba(58, 36, 24, 0.1)'
+                  }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`text-[10px] font-bold ${style.text} ${style.bg} px-2 py-0.5 rounded uppercase tracking-wider`}>
+                        {style.label}
+                      </span>
+                      <span className="text-[12px] text-[#888888] flex items-center gap-1">
+                        • {formatDate(ann.createdAt)}
+                      </span>
+                    </div>
+                    <h3 className="text-[15px] font-bold text-[#111111] group-hover:text-[#D45A2A] transition-colors truncate">
+                      {ann.title}
+                    </h3>
                   </div>
-                  <h3 className="text-[15px] font-bold text-[#111111] group-hover:text-[#D45A2A] transition-colors truncate">
-                    {ann.title}
-                  </h3>
-                </div>
-                
-                <div className="w-10 h-10 rounded-full bg-[#FFF9EE] flex items-center justify-center shrink-0 group-hover:bg-[#D45A2A] group-hover:text-white text-[#D45A2A] transition-colors">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
+                  
+                  <div className="w-10 h-10 rounded-full bg-[#FFF9EE] flex items-center justify-center shrink-0 group-hover:bg-[#D45A2A] group-hover:text-white text-[#D45A2A] transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         </div>
 

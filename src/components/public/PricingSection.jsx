@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 
-export default function PricingSection({ plans, section }) {
+export default function PricingSection({ plans = [], section }) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
 
@@ -20,12 +20,8 @@ export default function PricingSection({ plans, section }) {
     return () => observer.disconnect()
   }, [])
 
-  const TABLE_PLANS = [
-    { name: 'Giờ sáng', time: '06:00 - 08:00', price: '200.000đ/giờ', note: 'Giá ưu đãi' },
-    { name: 'Giờ hành chính', time: '08:00 - 17:00', price: '300.000đ/giờ', note: 'Thứ 2 - Thứ 6' },
-    { name: 'Giờ cao điểm', time: '17:00 - 22:00', price: '400.000đ/giờ', note: 'Tất cả các ngày', highlight: true },
-    { name: 'Cuối tuần', time: '08:00 - 17:00', price: '350.000đ/giờ', note: 'Thứ 7 & Chủ nhật' },
-  ]
+  const tablePlans = plans.filter(p => !p.name.toLowerCase().includes('gói tháng')).sort((a, b) => a.displayOrder - b.displayOrder)
+  const monthPlan = plans.find(p => p.name.toLowerCase().includes('gói tháng'))
 
   return (
     <section id="pricing" className="py-14 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
@@ -56,10 +52,10 @@ export default function PricingSection({ plans, section }) {
 
               {/* Table Rows */}
               <div className="divide-y divide-[#E8E2D2]">
-                {TABLE_PLANS.map((plan, index) => (
+                {tablePlans.map((plan, index) => (
                   <div 
                     key={index}
-                    className={`p-5 md:px-6 md:py-5 transition-colors ${plan.highlight ? 'bg-[#FFF4E8]' : 'hover:bg-[#F8F5E4]/50'}`}
+                    className={`p-5 md:px-6 md:py-5 transition-colors ${plan.name.toLowerCase().includes('cao điểm') ? 'bg-[#FFF4E8]' : 'hover:bg-[#F8F5E4]/50'}`}
                   >
                     {/* Mobile View */}
                     <div className="md:hidden">
@@ -68,17 +64,17 @@ export default function PricingSection({ plans, section }) {
                         <span className="text-[18px] font-bold text-[#D45A2A]">{plan.price}</span>
                       </div>
                       <div className="flex justify-between text-[13px]">
-                        <span className="text-[#555555] font-medium">{plan.time}</span>
-                        <span className="text-[#888888]">{plan.note}</span>
+                        <span className="text-[#555555] font-medium">{plan.timeSlot}</span>
+                        <span className="text-[#888888]">{plan.notes}</span>
                       </div>
                     </div>
 
                     {/* Desktop View */}
                     <div className="hidden md:grid grid-cols-[1fr_120px_140px_1fr] gap-0 items-center">
                       <h3 className="font-bold text-[15px] text-[#111111]">{plan.name}</h3>
-                      <span className="text-center text-[14px] text-[#555555] font-medium">{plan.time}</span>
+                      <span className="text-center text-[14px] text-[#555555] font-medium">{plan.timeSlot}</span>
                       <span className="text-center text-[18px] font-bold text-[#D45A2A]">{plan.price}</span>
-                      <span className="text-[13px] text-[#888888]">{plan.note}</span>
+                      <span className="text-[13px] text-[#888888]">{plan.notes}</span>
                     </div>
                   </div>
                 ))}
@@ -88,53 +84,56 @@ export default function PricingSection({ plans, section }) {
 
           {/* Right: Membership Card (5/12) */}
           <div className="lg:col-span-5">
-            <div 
-              className="relative p-6 sm:p-8 md:p-10 text-center transition-transform hover:-translate-y-2 duration-500"
-              style={{
-                background: 'linear-gradient(180deg, #FFF9EE 0%, #FBEAD8 100%)',
-                border: '1px solid rgba(212, 90, 42, 0.22)',
-                boxShadow: '0 24px 70px rgba(212, 90, 42, 0.14)',
-                borderRadius: '28px'
-              }}
-            >
-              {/* Badge */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-[#D45A2A] text-white text-[12px] font-bold uppercase tracking-widest rounded-full shadow-lg whitespace-nowrap">
-                Phổ biến nhất
-              </div>
 
-              <h3 className="font-heading text-2xl md:text-3xl font-bold text-[#111111] mb-3 mt-2">
-                Gói tháng tiết kiệm
-              </h3>
-              <p className="text-[#555555] text-[14px] leading-relaxed mb-6">
-                Dành cho người chơi thường xuyên hoặc nhóm bạn cố định
-              </p>
-              
-              <div className="mb-5 sm:mb-6 flex justify-center items-end gap-1">
-                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#D45A2A]">3.500.000đ</span>
-                <span className="text-[#888888] font-medium text-lg mb-1">/tháng</span>
-              </div>
+            {monthPlan && (
+              <div 
+                className="relative p-8 md:p-10 text-center transition-transform hover:-translate-y-2 duration-500"
+                style={{
+                  background: 'linear-gradient(180deg, #FFF9EE 0%, #FBEAD8 100%)',
+                  border: '1px solid rgba(212, 90, 42, 0.22)',
+                  boxShadow: '0 24px 70px rgba(212, 90, 42, 0.14)',
+                  borderRadius: '28px'
+                }}
+              >
+                {/* Badge */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-[#D45A2A] text-white text-[12px] font-bold uppercase tracking-widest rounded-full shadow-lg whitespace-nowrap">
+                  Phổ biến nhất
+                </div>
 
-              <ul className="text-left space-y-3 sm:space-y-4 mb-6 sm:mb-8 max-w-[260px] mx-auto">
-                <li className="flex items-center gap-3 text-[#111111] font-medium">
-                  <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  12 giờ chơi linh hoạt
-                </li>
-                <li className="flex items-center gap-3 text-[#111111] font-medium">
-                  <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Tiết kiệm 25% so với đặt lẻ
-                </li>
-                <li className="flex items-center gap-3 text-[#111111] font-medium">
-                  <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Giữ cố định khung giờ
-                </li>
-              </ul>
-            </div>
+                <h3 className="font-heading text-2xl md:text-3xl font-bold text-[#111111] mb-3 mt-2">
+                  {monthPlan.name}
+                </h3>
+                <p className="text-[#555555] text-[14px] leading-relaxed mb-6">
+                  {monthPlan.description || 'Dành cho người chơi thường xuyên hoặc nhóm bạn cố định'}
+                </p>
+                
+                <div className="mb-6 flex justify-center items-end gap-1">
+                  <span className="text-4xl md:text-5xl font-bold text-[#D45A2A]">{monthPlan.price?.split('/')[0] || monthPlan.price}</span>
+                  <span className="text-[#888888] font-medium text-lg mb-1">/tháng</span>
+                </div>
+
+                <ul className="text-left space-y-4 mb-8 max-w-[260px] mx-auto">
+                  <li className="flex items-center gap-3 text-[#111111] font-medium">
+                    <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {monthPlan.notes || '12 giờ chơi linh hoạt'}
+                  </li>
+                  <li className="flex items-center gap-3 text-[#111111] font-medium">
+                    <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Tiết kiệm so với đặt lẻ
+                  </li>
+                  <li className="flex items-center gap-3 text-[#111111] font-medium">
+                    <svg className="w-5 h-5 text-[#D45A2A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Giữ cố định khung giờ
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 
