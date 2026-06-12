@@ -1,0 +1,362 @@
+// This is your Prisma schema file for HaloPadel
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTH & USERS
+// ============================================
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique @db.NVarChar(255)
+  passwordHash String    @db.NVarChar(500)
+  fullName     String    @db.NVarChar(200)
+  phone        String?   @db.NVarChar(20)
+  avatar       String?   @db.NVarChar(500)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  blogPosts     BlogPost[]
+  promotions    Promotion[]
+  announcements Announcement[]
+  mediaFiles    MediaFile[]
+  auditLogs     AuditLog[]
+
+  @@map("Users")
+}
+
+// ============================================
+// VENUE
+// ============================================
+
+model Venue {
+  id              Int      @id @default(autoincrement())
+  name            String   @db.NVarChar(200)
+  slug            String   @unique @db.NVarChar(200)
+  logo            String?  @db.NVarChar(500)
+  shortDesc       String?  @db.NVarChar(500)
+  longDesc        String?  @db.NVarChar(Max)
+  hotline         String?  @db.NVarChar(20)
+  zalo            String?  @db.NVarChar(100)
+  email           String?  @db.NVarChar(255)
+  facebook        String?  @db.NVarChar(500)
+  tiktok          String?  @db.NVarChar(500)
+  address         String?  @db.NVarChar(500)
+  googleMapsUrl   String?  @db.NVarChar(1000)
+  googleMapsEmbed String?  @db.NVarChar(2000)
+  openingHours    String?  @db.NVarChar(Max) // JSON
+  seoTitle        String?  @db.NVarChar(200)
+  seoDescription  String?  @db.NVarChar(500)
+  ogImage         String?  @db.NVarChar(500)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  landingSections LandingSection[]
+  mediaFiles      MediaFile[]
+  blogCategories  BlogCategory[]
+  blogPosts       BlogPost[]
+  promotions      Promotion[]
+  announcements   Announcement[]
+  amenities       Amenity[]
+  pricingPlans    PricingPlan[]
+  contacts        Contact[]
+  seoSettings     SeoSetting[]
+  auditLogs       AuditLog[]
+
+  @@map("Venues")
+}
+
+// ============================================
+// LANDING PAGE
+// ============================================
+
+model LandingSection {
+  id           Int      @id @default(autoincrement())
+  venueId      Int
+  sectionKey   String   @db.NVarChar(50) // hero, about, quickinfo, gallery, amenities, pricing, promotions, announcements, blog, map, contact
+  title        String?  @db.NVarChar(200)
+  subtitle     String?  @db.NVarChar(500)
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  config       String?  @db.NVarChar(Max) // JSON extra config
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([venueId, sectionKey])
+  @@map("LandingSections")
+}
+
+// ============================================
+// MEDIA
+// ============================================
+
+model MediaFile {
+  id             Int       @id @default(autoincrement())
+  venueId        Int
+  url            String    @db.NVarChar(1000)
+  publicId       String?   @db.NVarChar(500)
+  fileName       String?   @db.NVarChar(255)
+  fileSize       Int?
+  width          Int?
+  height         Int?
+  mimeType       String?   @db.NVarChar(100)
+  category       String    @db.NVarChar(50) // LOGO, HERO, GALLERY, COURT, AMENITY, PROMOTION, BLOG, SEO, OTHER
+  altText        String?   @db.NVarChar(300)
+  caption        String?   @db.NVarChar(500)
+  isActive       Boolean   @default(true)
+  showOnHomepage Boolean   @default(false)
+  isFeatured     Boolean   @default(false)
+  displayOrder   Int       @default(0)
+  uploadedById   Int?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+
+  venue      Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("MediaFiles")
+}
+
+// ============================================
+// BLOG
+// ============================================
+
+model BlogCategory {
+  id           Int      @id @default(autoincrement())
+  venueId      Int
+  name         String   @db.NVarChar(100)
+  slug         String   @db.NVarChar(100)
+  description  String?  @db.NVarChar(300)
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  venue Venue      @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  posts BlogPost[]
+
+  @@unique([venueId, slug])
+  @@map("BlogCategories")
+}
+
+model BlogPost {
+  id             Int       @id @default(autoincrement())
+  venueId        Int
+  categoryId     Int?
+  authorId       Int?
+  title          String    @db.NVarChar(300)
+  slug           String    @db.NVarChar(300)
+  excerpt        String?   @db.NVarChar(500)
+  content        String?   @db.NVarChar(Max)
+  coverImage     String?   @db.NVarChar(1000)
+  status         String    @default("DRAFT") @db.NVarChar(20) // DRAFT, PUBLISHED, HIDDEN
+  showOnHomepage Boolean   @default(false)
+  isFeatured     Boolean   @default(false)
+  displayOrder   Int       @default(0)
+  seoTitle       String?   @db.NVarChar(200)
+  seoDescription String?   @db.NVarChar(500)
+  publishedAt    DateTime?
+  viewCount      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+
+  venue    Venue         @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  category BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  author   User?         @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([venueId, slug])
+  @@map("BlogPosts")
+}
+
+// ============================================
+// PROMOTIONS
+// ============================================
+
+model Promotion {
+  id             Int       @id @default(autoincrement())
+  venueId        Int
+  createdById    Int?
+  title          String    @db.NVarChar(300)
+  slug           String    @db.NVarChar(300)
+  banner         String?   @db.NVarChar(1000)
+  shortDesc      String?   @db.NVarChar(500)
+  content        String?   @db.NVarChar(Max)
+  startDate      DateTime?
+  endDate        DateTime?
+  conditions     String?   @db.NVarChar(Max)
+  ctaText        String?   @db.NVarChar(100)
+  ctaUrl         String?   @db.NVarChar(500)
+  isActive       Boolean   @default(true)
+  showOnHomepage Boolean   @default(false)
+  isFeatured     Boolean   @default(false)
+  displayOrder   Int       @default(0)
+  seoTitle       String?   @db.NVarChar(200)
+  seoDescription String?   @db.NVarChar(500)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+
+  venue     Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([venueId, slug])
+  @@map("Promotions")
+}
+
+// ============================================
+// ANNOUNCEMENTS
+// ============================================
+
+model Announcement {
+  id             Int       @id @default(autoincrement())
+  venueId        Int
+  createdById    Int?
+  title          String    @db.NVarChar(300)
+  slug           String    @db.NVarChar(300)
+  content        String?   @db.NVarChar(Max)
+  type           String    @default("INFO") @db.NVarChar(30) // INFO, PROMOTION, EVENT, MAINTENANCE, WARNING
+  image          String?   @db.NVarChar(1000)
+  startDate      DateTime?
+  endDate        DateTime?
+  isActive       Boolean   @default(true)
+  showOnHomepage Boolean   @default(false)
+  isPinned       Boolean   @default(false)
+  displayOrder   Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  isDeleted      Boolean   @default(false)
+  deletedAt      DateTime?
+
+  venue     Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([venueId, slug])
+  @@map("Announcements")
+}
+
+// ============================================
+// AMENITIES
+// ============================================
+
+model Amenity {
+  id           Int      @id @default(autoincrement())
+  venueId      Int
+  name         String   @db.NVarChar(100)
+  icon         String?  @db.NVarChar(100)
+  description  String?  @db.NVarChar(300)
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("Amenities")
+}
+
+// ============================================
+// PRICING
+// ============================================
+
+model PricingPlan {
+  id           Int      @id @default(autoincrement())
+  venueId      Int
+  name         String   @db.NVarChar(200)
+  description  String?  @db.NVarChar(500)
+  price        String?  @db.NVarChar(200)
+  timeSlot     String?  @db.NVarChar(200)
+  notes        String?  @db.NVarChar(500)
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("PricingPlans")
+}
+
+// ============================================
+// CONTACTS / LEADS
+// ============================================
+
+model Contact {
+  id           Int      @id @default(autoincrement())
+  venueId      Int
+  fullName     String   @db.NVarChar(200)
+  phone        String?  @db.NVarChar(20)
+  email        String?  @db.NVarChar(255)
+  message      String?  @db.NVarChar(Max)
+  sourcePage   String?  @db.NVarChar(200)
+  status       String   @default("NEW") @db.NVarChar(20) // NEW, CONTACTED, RESOLVED, SPAM
+  internalNote String?  @db.NVarChar(Max)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("Contacts")
+}
+
+// ============================================
+// SEO SETTINGS
+// ============================================
+
+model SeoSetting {
+  id              Int      @id @default(autoincrement())
+  venueId         Int
+  pageKey         String   @db.NVarChar(100) // home, about, gallery, promotions, announcements, blog, contact
+  metaTitle       String?  @db.NVarChar(200)
+  metaDescription String?  @db.NVarChar(500)
+  ogImage         String?  @db.NVarChar(500)
+  canonicalUrl    String?  @db.NVarChar(500)
+  schemaMarkup    String?  @db.NVarChar(Max) // JSON-LD
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([venueId, pageKey])
+  @@map("SeoSettings")
+}
+
+// ============================================
+// AUDIT LOGS
+// ============================================
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  venueId    Int?
+  action     String   @db.NVarChar(50) // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entityType String?  @db.NVarChar(50) // BlogPost, Promotion, etc.
+  entityId   Int?
+  oldValues  String?  @db.NVarChar(Max)
+  newValues  String?  @db.NVarChar(Max)
+  ipAddress  String?  @db.NVarChar(45)
+  userAgent  String?  @db.NVarChar(500)
+  createdAt  DateTime @default(now())
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venue Venue? @relation(fields: [venueId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("AuditLogs")
+}
