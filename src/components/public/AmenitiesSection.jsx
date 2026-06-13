@@ -78,7 +78,14 @@ export default function AmenitiesSection({ amenities, section }) {
     <section id="amenities" className="py-14 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1500px] mx-auto">
         {/* Header */}
-        <div className="text-center mb-10 md:mb-16">
+        <div
+          className="text-center mb-10 md:mb-16"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-40px)',
+            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+          }}
+        >
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             {t.amenities.sectionLabel}
           </p>
@@ -93,9 +100,12 @@ export default function AmenitiesSection({ amenities, section }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8">
           {/* Left Hero Image */}
           <div 
-            className={`lg:col-span-5 relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[400px] lg:min-h-full transition-all duration-1000 ease-out shadow-lg ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
-            }`}
+            className="lg:col-span-5 relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[400px] lg:min-h-full shadow-lg"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(-80px) scale(0.95)',
+              transition: 'opacity 1s cubic-bezier(0.16,1,0.3,1) 0.2s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.2s',
+            }}
           >
             <Image
               src="/images/gallery/gallery_lounge.png"
@@ -124,10 +134,12 @@ export default function AmenitiesSection({ amenities, section }) {
               return (
                 <div 
                   key={item.id}
-                  className={`group bg-white rounded-xl overflow-hidden border border-[#E8E2D2] hover:border-[#D45A2A]/40 transition-all duration-700 hover:shadow-[0_20px_40px_rgba(212,90,42,0.12)] hover:-translate-y-1.5 ${
-                    isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-24 scale-[0.98]'
-                  }`}
-                  style={{ transitionDelay: `${index * 150}ms` }}
+                  className="group bg-white rounded-xl overflow-hidden border border-[#E8E2D2] hover:border-[#D45A2A]/40 hover:shadow-[0_20px_40px_rgba(212,90,42,0.12)] hover:-translate-y-1.5 transition-[border-color,box-shadow,transform] duration-500"
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateX(0) translateY(0) scale(1)' : 'translateX(60px) translateY(30px) scale(0.94)',
+                    transition: `opacity 0.9s cubic-bezier(0.16,1,0.3,1) ${index * 120 + 300}ms, transform 0.9s cubic-bezier(0.16,1,0.3,1) ${index * 120 + 300}ms`,
+                  }}
                 >
                   {/* Image Half */}
                   <div className="relative h-[220px] overflow-hidden">

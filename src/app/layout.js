@@ -22,10 +22,22 @@ export const metadata = {
     "Sân thể thao HaloPadel - Không gian tập luyện đẳng cấp, tiện nghi hiện đại. Liên hệ ngay để trải nghiệm!",
   keywords: ["sân padel", "sân thể thao", "padel court", "thể thao"],
   authors: [{ name: "HaloPadel" }],
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     type: "website",
     locale: "vi_VN",
     siteName: "HaloPadel",
+    images: [
+      {
+        url: "/icon-512.png",
+        width: 512,
+        height: 512,
+        alt: "HaloPadel Logo",
+      },
+    ],
   },
   robots: {
     index: true,

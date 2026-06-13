@@ -81,7 +81,14 @@ export default function BlogSection({ section, posts: dbPosts }) {
     <section id="blog" className="py-14 md:py-24 bg-white" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1300px] mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mb-10 md:mb-16">
+        <div
+          className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mb-10 md:mb-16"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateX(0)' : 'translateX(-50px)',
+            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+          }}
+        >
           <div className="max-w-2xl">
             <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
               {t.blog.sectionLabel}
@@ -105,10 +112,17 @@ export default function BlogSection({ section, posts: dbPosts }) {
         </div>
 
         {/* Blog Grid (Featured + List) */}
-        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           
           {/* Left: Featured Post (7/12) */}
-          <div className="lg:col-span-7">
+          <div
+            className="lg:col-span-7"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translate(0,0) scale(1)' : 'translate(-50px, 40px) scale(0.96)',
+              transition: 'opacity 1s cubic-bezier(0.16,1,0.3,1) 0.2s, transform 1.1s cubic-bezier(0.16,1,0.3,1) 0.2s',
+            }}
+          >
             <Link 
               href={`/blog/${FEATURED_POST.slug}`}
               className="group block h-full rounded-3xl overflow-hidden bg-[#FFFDF6] border border-[#E8E2D2] hover:border-[#D45A2A]/30 transition-all duration-500 hover:shadow-[0_24px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1"
@@ -160,11 +174,16 @@ export default function BlogSection({ section, posts: dbPosts }) {
 
           {/* Right: List of smaller posts (5/12) */}
           <div className="lg:col-span-5 flex flex-col gap-5">
-            {SMALL_POSTS.map((post) => (
+            {SMALL_POSTS.map((post, postIdx) => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
                 className="group flex flex-col sm:flex-row items-stretch gap-5 p-4 rounded-2xl border border-transparent hover:border-[#E8E2D2] hover:bg-[#FFFDF6] transition-all duration-300 hover:shadow-sm"
+                style={{
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(60px) scale(0.96)',
+                  transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${postIdx * 120 + 350}ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${postIdx * 120 + 350}ms`,
+                }}
               >
                 {/* Thumbnail */}
                 <div className="relative w-full sm:w-[160px] md:w-[180px] shrink-0 h-[180px] sm:h-[140px] rounded-xl overflow-hidden">

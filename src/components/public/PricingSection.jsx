@@ -30,7 +30,14 @@ export default function PricingSection({ plans = [], section }) {
     <section id="pricing" className="py-14 md:py-28 bg-[#FFFDF6]" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1240px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-10 md:mb-16">
+        <div
+          className="text-center mb-10 md:mb-16"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-40px)',
+            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+          }}
+        >
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             {t.pricing.sectionLabel}
           </p>
@@ -40,10 +47,17 @@ export default function PricingSection({ plans = [], section }) {
         </div>
 
         {/* Pricing Layout (Table + Card) */}
-        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left: Table (7/12) */}
-          <div className="lg:col-span-7">
+          <div
+            className="lg:col-span-7"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(-70px) scale(0.96)',
+              transition: 'opacity 1s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.15s',
+            }}
+          >
             <div className="bg-white rounded-2xl border border-[#E8E2D2] overflow-hidden shadow-sm">
               {/* Table Header */}
               <div className="hidden md:grid grid-cols-[1fr_120px_140px_1fr] gap-0 bg-[#2A1A12] px-6 py-4 text-[13px] font-bold text-white uppercase tracking-wider">
@@ -86,7 +100,14 @@ export default function PricingSection({ plans = [], section }) {
           </div>
 
           {/* Right: Membership Card (5/12) */}
-          <div className="lg:col-span-5">
+          <div
+            className="lg:col-span-5"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(70px) scale(0.96)',
+              transition: 'opacity 1s cubic-bezier(0.16,1,0.3,1) 0.35s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.35s',
+            }}
+          >
 
             {monthPlan && (
               <div 
@@ -141,7 +162,14 @@ export default function PricingSection({ plans = [], section }) {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center mt-10 md:mt-16 max-w-2xl mx-auto">
+        <div
+          className="text-center mt-10 md:mt-16 max-w-2xl mx-auto"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+            transition: 'opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s',
+          }}
+        >
           <p className="text-[15px] font-medium text-[#111111] mb-6">
             {t.pricing.ctaText}
           </p>

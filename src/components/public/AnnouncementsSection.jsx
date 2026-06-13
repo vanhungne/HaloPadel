@@ -45,7 +45,14 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
     <section id="announcements" className="py-14 md:py-24 bg-[#FFFDF6]" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-10 md:mb-16">
+        <div
+          className="text-center mb-10 md:mb-16"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-40px)',
+            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+          }}
+        >
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             {t.announcements.sectionLabel}
           </p>
@@ -58,7 +65,7 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
         </div>
 
         {/* 2-Column Layout */}
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           
           {/* Left: Featured Announcement */}
 
@@ -69,7 +76,10 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
                 background: 'linear-gradient(135deg, #FFF9EE 0%, #FBEAD8 100%)',
                 border: '1px solid rgba(212, 90, 42, 0.18)',
                 borderRadius: '28px',
-                boxShadow: '0 24px 70px rgba(212, 90, 42, 0.12)'
+                boxShadow: '0 24px 70px rgba(212, 90, 42, 0.12)',
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translate(0,0) rotate(0deg) scale(1)' : 'translate(-60px, 40px) rotate(-1.5deg) scale(0.95)',
+                transition: 'opacity 1s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 1.1s cubic-bezier(0.16,1,0.3,1) 0.15s',
               }}
             >
               {featured.image && (
@@ -121,7 +131,7 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
 
           {/* Right: List of small announcements */}
           <div className="flex flex-col justify-between space-y-4">
-            {listAnnouncements.map((ann) => {
+            {listAnnouncements.map((ann, annIdx) => {
               const style = getTypeStyle(ann.type)
               return (
                 <Link
@@ -132,6 +142,9 @@ export default function AnnouncementsSection({ section, announcements = [] }) {
                     background: '#FFFDF7',
                     border: '1px solid rgba(58, 36, 24, 0.1)',
                     borderRadius: '20px',
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(60px) scale(0.96)',
+                    transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${annIdx * 100 + 300}ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${annIdx * 100 + 300}ms`,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-3px)'

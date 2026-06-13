@@ -3,14 +3,39 @@
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { localize, localizeStrict } from '@/lib/i18n/localize'
 import Image from 'next/image'
+import { useState, useEffect, useRef } from 'react'
 
 export default function GoogleMap({ venue, section }) {
   const { t, locale } = useLanguage()
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.08 }
+    )
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section id="map" className="py-12 md:py-24 bg-white">
+    <section id="map" className="py-12 md:py-24 bg-white" ref={sectionRef}>
       <div className="w-full px-4 md:px-8 max-w-[1200px] mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-8 md:mb-16">
+        <div
+          className="text-center mb-8 md:mb-16"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-40px)',
+            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+          }}
+        >
           <p className="text-[13px] font-semibold text-[#D45A2A] uppercase tracking-[0.2em] mb-3">
             {t.map.sectionLabel}
           </p>
@@ -24,7 +49,14 @@ export default function GoogleMap({ venue, section }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-10">
           {/* Map (8/12) */}
-          <div className="lg:col-span-8 relative rounded-[20px] sm:rounded-[28px] overflow-hidden border border-[#D45A2A]/20 h-[280px] sm:h-[360px] lg:h-[500px] shadow-[0_24px_70px_rgba(212,90,42,0.12)]">
+          <div
+            className="lg:col-span-8 relative rounded-[20px] sm:rounded-[28px] overflow-hidden border border-[#D45A2A]/20 h-[280px] sm:h-[360px] lg:h-[500px] shadow-[0_24px_70px_rgba(212,90,42,0.12)]"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(-60px) scale(0.96)',
+              transition: 'opacity 1s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.15s',
+            }}
+          >
             {/* Map Iframe */}
             {venue?.googleMapsEmbed ? (
               <div
@@ -66,7 +98,14 @@ export default function GoogleMap({ venue, section }) {
           </div>
 
           {/* Info Card (4/12) */}
-          <div className="lg:col-span-4 bg-[#FFFDF6] rounded-[20px] sm:rounded-[28px] p-5 sm:p-6 md:p-8 border border-[#E8E2D2] shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300">
+          <div
+            className="lg:col-span-4 bg-[#FFFDF6] rounded-[20px] sm:rounded-[28px] p-5 sm:p-6 md:p-8 border border-[#E8E2D2] shadow-sm flex flex-col hover:shadow-md transition-shadow duration-300"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(60px) scale(0.96)',
+              transition: 'opacity 1s cubic-bezier(0.16,1,0.3,1) 0.3s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.3s',
+            }}
+          >
             {/* Thumbnail Header */}
             <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-[#D45A2A]/20">
@@ -140,7 +179,14 @@ export default function GoogleMap({ venue, section }) {
         </div>
 
         {/* Quick Info Badges */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div
+          className="mt-8 flex flex-wrap items-center justify-center gap-4"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+            transition: 'opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s',
+          }}
+        >
           <div className="flex items-center gap-2 bg-[#FFF9EE] px-4 py-2 rounded-xl border border-[#D45A2A]/10 text-[13px] font-semibold text-[#111111]">
             <svg className="w-4 h-4 text-[#D45A2A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />

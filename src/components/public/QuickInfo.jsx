@@ -1,9 +1,26 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 
 export default function QuickInfo({ venue }) {
   const { t } = useLanguage()
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.2 }
+    )
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   if (!venue) return null
 
@@ -68,16 +85,19 @@ export default function QuickInfo({ venue }) {
   ].filter((item) => item.value)
 
   return (
-    <section id="quickinfo" className="relative z-20 -mt-[4rem] sm:-mt-[6rem] md:-mt-[12rem]">
+    <section id="quickinfo" className="relative z-20 -mt-[4rem] sm:-mt-[6rem] md:-mt-[12rem]" ref={sectionRef}>
       <div className="section-container">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {items.map((item, index) => (
             <div
               key={index}
-              className="bg-[#FFF9EE] rounded-[18px] sm:rounded-[22px] p-4 sm:p-6 group transition-all duration-300 hover:-translate-y-1"
+              className="bg-[#FFF9EE] rounded-[18px] sm:rounded-[22px] p-4 sm:p-6 group hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
               style={{
                 border: '1px solid rgba(58, 36, 24, 0.08)',
                 boxShadow: '0 8px 30px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02)',
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(50px) scale(0.95)',
+                transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${index * 100}ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${index * 100}ms`,
               }}
             >
               <div className="flex items-start gap-4">
